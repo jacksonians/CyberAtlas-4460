@@ -1,0 +1,204 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Navigation Sidebar */
+.sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 80px;
+    height: 100vh;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.nav-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nav-svg {
+    display: block;
+}
+
+/* Navigation Circles */
+.nav-circle {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-circle circle {
+    fill: rgba(255, 255, 255, 0.3);
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 2;
+    transition: all 0.3s ease;
+}
+
+.nav-circle:hover circle {
+    fill: rgba(255, 255, 255, 0.5);
+    stroke: rgba(255, 255, 255, 0.9);
+    stroke-width: 3;
+}
+
+.nav-circle.active circle {
+    fill: #00adb5;
+    stroke: #00fff2;
+    stroke-width: 3;
+}
+
+.nav-circle text {
+    fill: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-anchor: middle;
+    pointer-events: none;
+    display: none;
+}
+
+/* Main Content */
+.content {
+    margin-left: 0;
+    width: 100%;
+}
+
+/* Content Sections */
+.content-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    position: relative;
+}
+
+.section-inner {
+    max-width: 800px;
+    text-align: center;
+}
+
+/* Section Colors */
+#section1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+#section2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+#section3 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+#section4 {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+}
+
+#section5 {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+/* Typography */
+.content-section h1 {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.content-section p {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .content-section h1 {
+        font-size: 2rem;
+    }
+
+    .content-section p {
+        font-size: 1rem;
+    }
+
+    .content-section {
+        padding: 40px 20px;
+    }
+
+    .nav-svg {
+        width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 50px;
+    }
+
+    .content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .content-section h1 {
+        font-size: 1.5rem;
+    }
+
+    .content-section p {
+        font-size: 0.9rem;
+    }
+
+    .nav-circle circle {
+        stroke-width: 1.5;
+    }
+
+    .nav-circle text {
+        font-size: 10px;
+    }
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Animation for section entrance */
+.content-section {
+    opacity: 0;
+    animation: fadeIn 0.8s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
