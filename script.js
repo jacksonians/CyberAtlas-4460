@@ -1,88 +1,167 @@
-document.addEventListener("DOMContentLoaded", function () {
-
-
-    const sections = document.querySelectorAll(".content-section");
+// Wait for DOM to load
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuration
+    const sections = document.querySelectorAll('.content-section');
     const numSections = sections.length;
     const circleRadius = 12;
     const circleSpacing = 60;
     const svgHeight = numSections * circleSpacing;
 
-    const svg = d3.select(".nav-svg").attr("height", svgHeight);
+    // Update SVG height
+    const svg = d3.select('.nav-svg')
+        .attr('height', svgHeight);
 
-    const navCircles = svg
-        .selectAll(".nav-circle")
+    // Create navigation circles using D3.js
+    const navCircles = svg.selectAll('.nav-circle')
         .data(d3.range(numSections))
         .enter()
-        .append("g")
-        .attr("class", "nav-circle")
-        .attr("transform", (d, i) => `translate(30, ${circleSpacing * i + 30})`)
-        .attr("data-section", d => d);
+        .append('g')
+        .attr('class', 'nav-circle')
+        .attr('transform', (d, i) => `translate(30, ${circleSpacing * i + 30})`)
+        .attr('data-section', d => d);
 
-    navCircles.append("circle")
-        .attr("r", circleRadius)
-        .attr("cx", 0)
-        .attr("cy", 0);
+    // Add circles
+    navCircles.append('circle')
+        .attr('r', circleRadius)
+        .attr('cx', 0)
+        .attr('cy', 0);
 
-    navCircles.append("text")
-        .attr("x", 0)
-        .attr("y", 4)
+    // Add numbers to circles
+    navCircles.append('text')
+        .attr('x', 0)
+        .attr('y', 4)
         .text(d => d + 1);
 
-    navCircles.on("click", function (event, d) {
+    // Click handler for navigation circles
+    navCircles.on('click', function(event, d) {
         const targetSection = document.getElementById(`section${d + 1}`);
         if (targetSection) {
             targetSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
+                behavior: 'smooth',
+                block: 'start'
             });
         }
     });
 
+    // Scroll detection logic
     let ticking = false;
+
     function updateActiveCircle() {
         const scrollPosition = window.scrollY + window.innerHeight / 2;
         let activeIndex = 0;
+
+        // Find which section is currently in view
         sections.forEach((section, index) => {
             const sectionTop = section.offsetTop;
             const sectionBottom = sectionTop + section.offsetHeight;
+
             if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
                 activeIndex = index;
             }
         });
-        navCircles.classed("active", d => d === activeIndex);
+
+        // Update active circle
+        navCircles.classed('active', function(d) {
+            return d === activeIndex;
+        });
+
         ticking = false;
     }
 
-    window.addEventListener("scroll", function () {
+    // Throttled scroll handler
+    function onScroll() {
         if (!ticking) {
             window.requestAnimationFrame(updateActiveCircle);
             ticking = true;
         }
-    });
+    }
 
+    // Add scroll event listener
+    window.addEventListener('scroll', onScroll);
+
+    // Initialize - set first circle as active
     updateActiveCircle();
 
+    // Add hover effects with D3
     navCircles
-        .on("mouseenter", function () {
+        .on('mouseenter', function() {
             d3.select(this)
                 .transition()
                 .duration(200)
-                .attr("transform", function () {
-                    const t = d3.select(this).attr("transform");
-                    const match = t.match(/translate\((\d+),\s*(\d+)\)/);
-                    return match ? `translate(${match[1]}, ${match[2]}) scale(1.2)` : t;
+                .attr('transform', function() {
+                    const currentTransform = d3.select(this).attr('transform');
+                    const match = currentTransform.match(/translate\((\d+),\s*(\d+)\)/);
+                    if (match) {
+                        return `translate(${match[1]}, ${match[2]}) scale(1.2)`;
+                    }
+                    return currentTransform;
                 });
         })
-        .on("mouseleave", function () {
+        .on('mouseleave', function() {
             d3.select(this)
                 .transition()
                 .duration(200)
-                .attr("transform", function () {
-                    const t = d3.select(this).attr("transform");
-                    const match = t.match(/translate\((\d+),\s*(\d+)\)/);
-                    return match ? `translate(${match[1]}, ${match[2]})` : t;
+                .attr('transform', function() {
+                    const currentTransform = d3.select(this).attr('transform');
+                    const match = currentTransform.match(/translate\((\d+),\s*(\d+)\)/);
+                    if (match) {
+                        return `translate(${match[1]}, ${match[2]})`;
+                    }
+                    return currentTransform;
                 });
         });
+
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            updateActiveCircle();
+        }, 250);
+    });
+
+    // Optional: Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        const activeCircle = document.querySelector('.nav-circle.active');
+        if (!activeCircle) return;
+
+        const currentIndex = parseInt(activeCircle.getAttribute('data-section'));
+        let targetIndex;
+
+        // Arrow Up or Page Up
+        if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            targetIndex = Math.max(0, currentIndex - 1);
+        }
+        // Arrow Down or Page Down
+        else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+            e.preventDefault();
+            targetIndex = Math.min(numSections - 1, currentIndex + 1);
+        }
+        // Home key
+        else if (e.key === 'Home') {
+            e.preventDefault();
+            targetIndex = 0;
+        }
+        // End key
+        else if (e.key === 'End') {
+            e.preventDefault();
+            targetIndex = numSections - 1;
+        }
+
+        if (targetIndex !== undefined) {
+            const targetSection = document.getElementById(`section${targetIndex + 1}`);
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+    });
+
+    console.log('CyberAtlas navigation initialized with', numSections, 'sections');
+
 
 
     const width = 800, height = 500;
