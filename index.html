@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberAtlas - Interactive Visualization</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- D3.js library -->
+    
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
+
 </head>
 <body>
     <!-- Navigation Sidebar -->
@@ -47,10 +50,10 @@
 
         <!-- Section 4 -->
         <section id="section4" class="content-section" data-section="3">
-            <div class="section-inner">
-                <h1>Responsive Design</h1>
-                <p>Enjoy a consistent experience across all devices and screen sizes.</p>
-                <p>Our design adapts to provide optimal viewing on desktop, tablet, and mobile.</p>
+            <div class="section-inner map-container">
+                <h1>Global Cybersecurity Metrics</h1>
+                <p>Explore interactive cybersecurity data from around the world</p>
+                <div id="mapVis"></div>
             </div>
         </section>
 
@@ -65,6 +68,12 @@
     </main>
 
     <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+
     <script src="script.js"></script>
+    <script src="main.js"></script>
+
 </body>
 </html>

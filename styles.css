@@ -202,3 +202,115 @@ html {
         opacity: 1;
     }
 }
+
+/* Map Visualization Styles */
+.map-container {
+    width: 100%;
+    max-width: 1200px;
+}
+
+#mapVis {
+    width: 100%;
+    height: 600px;
+    position: relative;
+    background: transparent;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* Tooltip Styles */
+.tooltip {
+    position: absolute;
+    text-align: left;
+    padding: 12px;
+    font-size: 14px;
+    background: #1a1a2e;
+    border: 1px solid #00fff2;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 255, 242, 0.3);
+    z-index: 1000;
+    color: white;
+}
+
+.tooltip h3 {
+    margin: 0 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #00fff2;
+    color: #00fff2;
+    font-size: 16px;
+}
+
+.tooltip h4 {
+    margin: 5px 0;
+    font-weight: normal;
+    color: #e0e0e0;
+    font-size: 13px;
+}
+
+/* Map Country Styles */
+.country {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.country:hover {
+    stroke-width: 2px !important;
+    stroke: #00fff2 !important;
+    filter: brightness(1.2);
+}
+
+/* Legend Styles */
+.legend text {
+    font-size: 11px;
+    fill: #00fff2;
+    font-weight: 600;
+}
+
+.legend-axis path,
+.legend-axis line {
+    stroke: #00fff2;
+}
+
+/* Map Title */
+#map-title text {
+    font-size: 20px;
+    font-weight: bold;
+    fill: #00fff2;
+    text-shadow: 0 0 10px rgba(0, 255, 242, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive Map Styles */
+@media (max-width: 768px) {
+    #mapVis {
+        height: 400px;
+    }
+
+    #map-title text {
+        font-size: 16px;
+    }
+
+    .tooltip {
+        font-size: 12px;
+    }
+
+    .tooltip h3 {
+        font-size: 14px;
+    }
+
+    .tooltip h4 {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    #mapVis {
+        height: 300px;
+    }
+
+    #map-title text {
+        font-size: 14px;
+    }
+}
