@@ -1,3 +1,13 @@
+/* CSS Variables */
+:root {
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 32px;
+    --space-xl: 48px;
+    --space-2xl: 64px;
+}
+
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -7,8 +17,43 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: 
+        linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%),
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 242, 0.03), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(102, 224, 255, 0.02), transparent 50%);
+    color: #e6edf7;
     overflow-x: hidden;
     scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    min-height: 100vh;
+}
+
+/* Grid overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 242, 0.1) 2px,
+            rgba(0, 255, 242, 0.1) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 242, 0.1) 2px,
+            rgba(0, 255, 242, 0.1) 4px
+        );
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Navigation Sidebar */
@@ -42,22 +87,23 @@ body {
 }
 
 .nav-circle circle {
-    fill: rgba(255, 255, 255, 0.3);
-    stroke: rgba(255, 255, 255, 0.6);
+    fill: rgba(255, 255, 255, 0.2);
+    stroke: rgba(255, 255, 255, 0.4);
     stroke-width: 2;
     transition: all 0.3s ease;
 }
 
 .nav-circle:hover circle {
-    fill: rgba(255, 255, 255, 0.5);
-    stroke: rgba(255, 255, 255, 0.9);
-    stroke-width: 3;
+    fill: rgba(0, 255, 242, 0.3);
+    stroke: rgba(0, 255, 242, 0.6);
+    stroke-width: 2;
 }
 
 .nav-circle.active circle {
-    fill: #00adb5;
+    fill: #00fff2;
     stroke: #00fff2;
-    stroke-width: 3;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 242, 0.4));
 }
 
 .nav-circle text {
@@ -73,6 +119,8 @@ body {
 .content {
     margin-left: 0;
     width: 100%;
+    position: relative;
+    z-index: 2;
 }
 
 /* Content Sections */
@@ -81,54 +129,121 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 60px 40px;
+    padding: clamp(48px, 6vw, 96px) var(--space-md);
     position: relative;
+    scroll-snap-align: start;
 }
 
 .section-inner {
-    max-width: 800px;
+    max-width: 1000px;
+    width: 100%;
     text-align: center;
 }
 
-/* Section Colors */
-#section1 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-#section2 {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-}
-
-#section3 {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-}
-
-#section4 {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    color: white;
-}
-
-#section5 {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    color: white;
-}
-
 /* Typography */
-.content-section h1 {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
+h1 {
+    font-size: clamp(32px, 5vw, 64px);
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.1;
+    margin-bottom: var(--space-md);
+    color: #e6edf7;
 }
 
-.content-section p {
-    font-size: 1.25rem;
-    line-height: 1.8;
-    margin-bottom: 1rem;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+h2 {
+    font-size: clamp(24px, 3.5vw, 40px);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: var(--space-sm);
+    color: #e6edf7;
+}
+
+p {
+    font-size: clamp(16px, 2vw, 20px);
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+    color: #9fb3c8;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Cards */
+.card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    padding: var(--space-lg);
+    backdrop-filter: blur(8px);
+    margin: var(--space-md) 0;
+}
+
+/* Placeholders */
+.placeholder {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: var(--space-xl);
+    text-align: center;
+    color: #9fb3c8;
+    font-size: 14px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.placeholder input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #e6edf7;
+    font-size: 16px;
+    width: 200px;
+}
+
+.placeholder button {
+    background: #00fff2;
+    color: #0a0a0f;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.placeholder button:hover {
+    background: #66e0ff;
+    transform: translateY(-2px);
+}
+
+/* Lists */
+ul {
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+li {
+    margin: var(--space-sm) 0;
+    color: #9fb3c8;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+li::marker {
+    color: #00fff2;
+}
+
+/* Map/Globe specific styling */
+#mapVis {
+    width: 100%;
+    height: clamp(320px, 56vh, 620px);
+    border-radius: 16px;
+    background: transparent;
 }
 
 /* Responsive Design */
@@ -137,44 +252,26 @@ body {
         width: 60px;
     }
 
-    .content {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    .content-section h1 {
-        font-size: 2rem;
-    }
-
-    .content-section p {
-        font-size: 1rem;
-    }
-
     .content-section {
-        padding: 40px 20px;
+        padding: var(--space-lg) var(--space-sm);
     }
 
     .nav-svg {
         width: 50px;
+    }
+
+    .placeholder {
+        min-height: 250px;
+    }
+
+    .placeholder input {
+        width: 100%;
     }
 }
 
 @media (max-width: 480px) {
     .sidebar {
         width: 50px;
-    }
-
-    .content {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    .content-section h1 {
-        font-size: 1.5rem;
-    }
-
-    .content-section p {
-        font-size: 0.9rem;
     }
 
     .nav-circle circle {
@@ -184,11 +281,14 @@ body {
     .nav-circle text {
         font-size: 10px;
     }
-}
 
-/* Smooth Scrolling */
-html {
-    scroll-behavior: smooth;
+    .content-section {
+        padding: var(--space-md) var(--space-sm);
+    }
+
+    .placeholder {
+        min-height: 200px;
+    }
 }
 
 /* Animation for section entrance */
@@ -203,22 +303,7 @@ html {
     }
 }
 
-/* Map Visualization Styles */
-.map-container {
-    width: 100%;
-    max-width: 1200px;
-}
-
-#mapVis {
-    width: 100%;
-    height: 600px;
-    position: relative;
-    background: transparent;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
-/* Tooltip Styles */
+/* Tooltip Styles for D3 visualizations */
 .tooltip {
     position: absolute;
     text-align: left;
@@ -250,67 +335,3 @@ html {
     font-size: 13px;
 }
 
-/* Map Country Styles */
-.country {
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.country:hover {
-    stroke-width: 2px !important;
-    stroke: #00fff2 !important;
-    filter: brightness(1.2);
-}
-
-/* Legend Styles */
-.legend text {
-    font-size: 11px;
-    fill: #00fff2;
-    font-weight: 600;
-}
-
-.legend-axis path,
-.legend-axis line {
-    stroke: #00fff2;
-}
-
-/* Map Title */
-#map-title text {
-    font-size: 20px;
-    font-weight: bold;
-    fill: #00fff2;
-    text-shadow: 0 0 10px rgba(0, 255, 242, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* Responsive Map Styles */
-@media (max-width: 768px) {
-    #mapVis {
-        height: 400px;
-    }
-
-    #map-title text {
-        font-size: 16px;
-    }
-
-    .tooltip {
-        font-size: 12px;
-    }
-
-    .tooltip h3 {
-        font-size: 14px;
-    }
-
-    .tooltip h4 {
-        font-size: 11px;
-    }
-}
-
-@media (max-width: 480px) {
-    #mapVis {
-        height: 300px;
-    }
-
-    #map-title text {
-        font-size: 14px;
-    }
-}
