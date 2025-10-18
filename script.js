@@ -396,7 +396,7 @@ function handleSubmit(event) {
         
         // Show different message based on whether they got it right
         if (difference === 0) {
-            resultMessage.textContent = 'Lucky guess or are you part of the organization? Either way, that was the correct answer.';
+            resultMessage.textContent = 'Lucky guess or are you part of the organization? Either way, that is the correct answer.';
         } else {
             resultMessage.textContent = `Nice try. You were off by ${difference} attacks. The correct answer is ${correctAnswer}.`;
         }
