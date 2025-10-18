@@ -316,21 +316,44 @@ body {
 #section5 .section-inner {
     background: white;
     color: black;
-    padding: 60px 80px;
+    padding: 80px 100px;
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    max-width: 1000px;
-    width: 90%;
+    max-width: 1400px;
+    width: 95%;
 }
 
 #section5 h1 {
     color: black;
     text-shadow: none;
+    font-size: 2rem;
 }
 
 #section5 p {
     color: #333;
     text-shadow: none;
+}
+
+#section5 .section-inner > div:first-child {
+    margin-bottom: 30px;
+}
+
+#section5 .visualization-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+#section5 .visualization-container p {
+    flex: 0 0 300px;
+    text-align: left;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+#section5 .visualization-container #attackViz {
+    flex: 1;
 }
 
 #section6 {

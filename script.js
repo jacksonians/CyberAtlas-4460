@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configuration
     const sections = document.querySelectorAll('.content-section');
     const numSections = sections.length;
-    const circleRadius = 12;
-    const circleSpacing = 60;
+    const circleRadius = 8;
+    const circleSpacing = 40;
     const svgHeight = numSections * circleSpacing;
 
     // Update SVG height
@@ -120,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 250);
     });
 
-    // Optional: Add keyboard navigation
     document.addEventListener('keydown', function(e) {
         const activeCircle = document.querySelector('.nav-circle.active');
         if (!activeCircle) return;
@@ -164,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    const width = 800, height = 500;
+    const width = 800, height = 600;
     const attackSvg = d3.select("#attackViz").append("svg")
         .attr("width", width)
         .attr("height", height);
