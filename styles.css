@@ -92,28 +92,434 @@ body {
 
 /* Section Colors */
 #section1 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
     color: white;
+    position: relative;
+}
+
+#section1 .section-inner {
+    background: white;
+    color: black;
+    padding: 40px 60px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+#section1 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section1 p {
+    color: #333;
+    text-shadow: none;
 }
 
 #section2 {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
     color: white;
+    position: relative;
+}
+
+#section2 .section-inner {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 60px;
+}
+
+#section2 .image-container {
+    flex: 0 0 auto;
+    width: 400px;
+    height: 550px;
+    background: white;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#section2 .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#section2 .question-container {
+    flex: 1;
+    background: white;
+    color: black;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+}
+
+#section2 .question-container h1 {
+    color: black;
+    text-shadow: none;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+#section2 .question-container p {
+    color: #333;
+    text-shadow: none;
+    margin-bottom: 20px;
+}
+
+#section2 .question-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#section2 .question-form label {
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+#section2 .input-group {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+#section2 .question-form input[type="number"] {
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#section2 .question-form input[type="number"]:focus {
+    border-color: #00ff00;
+}
+
+#section2 .question-form button {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: black;
+    background: #00ff00;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#section2 .question-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 255, 0, 0.4);
+}
+
+#section2 .question-form button:active {
+    transform: translateY(0);
+}
+
+#section2 .result-message {
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 20px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+
+#section2 .result-message.show {
+    display: block;
+    opacity: 1;
+}
+
+#section2 .question-content {
+    transition: opacity 0.5s ease-out;
+}
+
+#section2 .question-content.fade-out {
+    opacity: 0;
 }
 
 #section3 {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
     color: white;
+    position: relative;
+}
+
+#section3 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section3 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section3 p {
+    color: #333;
+    text-shadow: none;
 }
 
 #section4 {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
     color: white;
+    position: relative;
+}
+
+#section4 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section4 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section4 p {
+    color: #333;
+    text-shadow: none;
 }
 
 #section5 {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
     color: white;
+    position: relative;
+}
+
+#section5 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section5 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section5 p {
+    color: #333;
+    text-shadow: none;
+}
+
+#section6 {
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    position: relative;
+}
+
+#section6 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section6 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section6 p {
+    color: #333;
+    text-shadow: none;
+}
+
+#section7 {
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    position: relative;
+}
+
+#section7 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section7 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section7 p {
+    color: #333;
+    text-shadow: none;
+}
+
+#section8 {
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    position: relative;
+}
+
+#section8 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section8 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section8 p {
+    color: #333;
+    text-shadow: none;
+}
+
+#section9 {
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    position: relative;
+}
+
+#section9 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section9 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section9 p {
+    color: #333;
+    text-shadow: none;
+}
+
+#section10 {
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    position: relative;
+}
+
+#section10 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section10 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section10 p {
+    color: #333;
+    text-shadow: none;
+}
+
+#section11 {
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    position: relative;
+}
+
+#section11 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section11 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section11 p {
+    color: #333;
+    text-shadow: none;
+}
+
+#section12 {
+    background: url('images/background.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    position: relative;
+}
+
+#section12 .section-inner {
+    background: white;
+    color: black;
+    padding: 60px 80px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 90%;
+}
+
+#section12 h1 {
+    color: black;
+    text-shadow: none;
+}
+
+#section12 p {
+    color: #333;
+    text-shadow: none;
 }
 
 /* Typography */
@@ -157,6 +563,28 @@ body {
     .nav-svg {
         width: 50px;
     }
+
+    #section2 .section-inner {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    #section2 .image-container {
+        width: 280px;
+        height: 390px;
+    }
+
+    #section2 .question-container {
+        max-width: 100%;
+    }
+
+    #section2 .input-group {
+        flex-direction: row;
+    }
+
+    #section1 .section-inner {
+        padding: 30px 40px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -183,6 +611,23 @@ body {
 
     .nav-circle text {
         font-size: 10px;
+    }
+
+    #section2 .image-container {
+        width: 200px;
+        height: 280px;
+    }
+
+    #section2 .question-container {
+        padding: 25px;
+    }
+
+    #section2 .input-group {
+        flex-direction: column;
+    }
+
+    #section1 .section-inner {
+        padding: 25px 30px;
     }
 }
 
