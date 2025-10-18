@@ -373,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         step();
     }
+
 });
 
 // Handle form submission in Section 2
