@@ -1,0 +1,104 @@
+/* Map/Globe specific styling */
+.card {
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+#mapVis {
+    width: 100%;
+    height: clamp(320px, 56vh, 620px);
+    min-height: 500px;
+    border-radius: 16px;
+    background: transparent;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .content-section {
+        padding: var(--space-lg) var(--space-sm);
+    }
+
+    .nav-svg {
+        width: 50px;
+    }
+
+    .placeholder {
+        min-height: 250px;
+    }
+
+    .placeholder input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 50px;
+    }
+
+    .nav-circle circle {
+        stroke-width: 1.5;
+    }
+
+    .nav-circle text {
+        font-size: 10px;
+    }
+
+    .content-section {
+        padding: var(--space-md) var(--space-sm);
+    }
+
+    .placeholder {
+        min-height: 200px;
+    }
+}
+
+/* Animation for section entrance */
+.content-section {
+    opacity: 0;
+    animation: fadeIn 0.8s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tooltip Styles for D3 visualizations */
+.tooltip {
+    position: absolute;
+    text-align: left;
+    padding: 12px;
+    font-size: 14px;
+    background: #1a1a2e;
+    border: 1px solid #00fff2;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 255, 242, 0.3);
+    z-index: 1000;
+    color: white;
+}
+
+.tooltip h3 {
+    margin: 0 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #00fff2;
+    color: #00fff2;
+    font-size: 16px;
+}
+
+.tooltip h4 {
+    margin: 5px 0;
+    font-weight: normal;
+    color: #e0e0e0;
+    font-size: 13px;
+}

@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberAtlas - Interactive Visualization</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="globevis.css">
     <!-- D3.js library -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
 </head>
 <body>
     <!-- Navigation Sidebar -->
@@ -62,8 +65,11 @@
         <!-- Section 4 -->
         <section id="section4" class="content-section" data-section="3">
             <div class="section-inner">
-                <h1>Globe Visualization</h1>
-                <p>Explore the interactive globe to see real-time cyberattack data from around the world.</p>
+                <h2>Global Cybersecurity Metrics</h2>
+                <p>Drag to rotate. Hover for metrics.</p>
+                <div class="card">
+                    <div id="mapVis"></div>
+                </div>
             </div>
         </section>
 
@@ -105,25 +111,46 @@
          <!-- Section 8 -->
         <section id="section8" class="content-section" data-section="7">
             <div class="section-inner">
-                <h1>Types of Attacks Over Time</h1>
-                <p>placeholder</p>
+                <h2>Types of Attacks Over Time</h2>
+                <div class="card">
+                    <div class="placeholder">
+                        <div id="vis-types-area">Attack Types Area Chart Placeholder</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="placeholder">
+                        <div id="vis-types-bar">Attack Types Bar Chart Placeholder</div>
+                    </div>
+                </div>
             </div>
         </section>
 
          <!-- Section 9 -->
         <section id="section9" class="content-section" data-section="8">
             <div class="section-inner">
-                <h1>What Can We Do To Stop These Attacks?</h1>
-                <p>placeholder</p>
-                <p>visualization</p>
+               <h2>What Actually Reduces Risk</h2>
+                <div class="card">
+                    <div class="placeholder">
+                        <div id="vis-actions">Risk Reduction Actions Placeholder</div>
+                    </div>
+                </div>
             </div>
         </section>
 
          <!-- Section 10 -->
         <section id="section10" class="content-section" data-section="9">
             <div class="section-inner">
-                <h1>How to Protect Yourself Against Cyberattacks</h1>
-                <p>placeholder</p>
+                <h2>Practical Steps to Avoid Attacks</h2>
+                <div class="card">
+                    <ul>
+                        <li>Enable multi-factor authentication</li>
+                        <li>Keep software updated</li>
+                        <li>Use strong, unique passwords</li>
+                        <li>Be cautious with email attachments</li>
+                        <li>Back up important data regularly</li>
+                        <li>Educate yourself on phishing</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -145,13 +172,24 @@
         <!-- Section 12 -->
         <section id="section12" class="content-section" data-section="11">
             <div class="section-inner">
-                <h1>Sources and Credits</h1>
-                <p>Sources and credits content goes here.</p>
+                <h2>Sources</h2>
+                <div class="card">
+                    <ul>
+                        <li>Global Cybersecurity Index (GCI) - ITU</li>
+                        <li>National Cybersecurity Index (NCSI)</li>
+                        <li>Cyber Exposure Index (CEI)</li>
+                        <li>Digital Development Level (DDL)</li>
+                        <li>FBI Internet Crime Report</li>
+                        <li>Verizon Data Breach Investigations Report</li>
+                        <li>IBM Cost of Data Breach Study</li>
+                    </ul>
+                </div>
             </div>
         </section>
     </main>
 
     <!-- JavaScript -->
     <script src="script.js"></script>
+    <script src="globevis.js"></script>
 </body>
 </html>
