@@ -21,45 +21,132 @@
         <!-- Section 1 -->
         <section id="section1" class="content-section" data-section="0">
             <div class="section-inner">
-                <h1>Welcome to CyberAtlas</h1>
-                <p>An interactive visualization experience with seamless navigation.</p>
-                <p>Scroll down or use the navigation circles on the left to explore different sections.</p>
+                <h1>Invisible Wars</h1>
+                <h2>The Global Web of Cyber Conflicts</h2>
+                <p></p>
+                <p>Explore the danger of cyberattacks and learn ways to protect yourself.</p>
             </div>
         </section>
 
         <!-- Section 2 -->
         <section id="section2" class="content-section" data-section="1">
             <div class="section-inner">
-                <h1>Data Visualization</h1>
-                <p>Discover powerful insights through interactive data visualizations.</p>
-                <p>Our platform leverages D3.js to create dynamic and responsive charts.</p>
+                <div class="image-container">
+                    <img src="images/anonymous.jpg" alt="Anonymous">
+                </div>
+                <div class="question-container">
+                    <div class="question-content" id="questionContent">
+                        <h1>Question.</h1>
+                        <p>How many cyberattacks occur every day in the United States?</p>
+                        <form class="question-form" onsubmit="return handleSubmit(event)">
+                            <div class="input-group">
+                                <input type="number" id="numberInput" name="numberInput" required placeholder="Answer Here">
+                                <button type="submit">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="resultMessage" class="result-message"></div>
+                </div>
             </div>
         </section>
 
         <!-- Section 3 -->
         <section id="section3" class="content-section" data-section="2">
             <div class="section-inner">
-                <h1>Interactive Features</h1>
-                <p>Navigate seamlessly through content with our intuitive scroll-based interface.</p>
-                <p>Click on navigation circles to jump directly to any section.</p>
+                <h1>Global Report</h1>
+                <p>According to a study by the University of Maryland, a cyber attack occurs every 39 seconds, translating into an average of 2,244 attacks per day.</p>
+                <p>These attacks are becoming increasingly common. In Q2 of 2024, global cyberattacks have increased by 30%.</p>
             </div>
         </section>
 
         <!-- Section 4 -->
         <section id="section4" class="content-section" data-section="3">
             <div class="section-inner">
-                <h1>Responsive Design</h1>
-                <p>Enjoy a consistent experience across all devices and screen sizes.</p>
-                <p>Our design adapts to provide optimal viewing on desktop, tablet, and mobile.</p>
+                <h1>Globe Visualization</h1>
+                <p>Explore the interactive globe to see real-time cyberattack data from around the world.</p>
             </div>
         </section>
 
         <!-- Section 5 -->
         <section id="section5" class="content-section" data-section="4">
             <div class="section-inner">
-                <h1>Get Started</h1>
-                <p>Ready to explore more? Start building your own visualizations today.</p>
-                <p>Thank you for exploring CyberAtlas!</p>
+                <!-- Title above the visualization -->
+                <div style="text-align:center;">
+                    <h1>One Breach Impacts More Than You Think</h1>
+                </div>
+
+                <!-- Description and visualization side by side -->
+                <div class="visualization-container">
+                    <p>
+                        Click a node (like JFK Airport or the Power Grid) to see how a single cyber attack spreads through interconnected systems in New York City.
+                    </p>
+                    <div id="attackViz" style="width:100%; height:500px;"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section 6 -->
+        <section id="section6" class="content-section" data-section="5">
+            <div class="section-inner">
+                <h1>Most Targeted Industries</h1>
+                <p>Discover which industries are most frequently targeted by cyberattacks.</p>
+            </div>
+        </section>
+
+        <!-- Section 7 -->
+        <section id="section7" class="content-section" data-section="6">
+            <div class="section-inner">
+                <h1>Victims of Attacks</h1>
+                <p>Explore the impact of cyberattacks on various sectors and organizations.</p>
+            </div>
+        </section>
+
+         <!-- Section 8 -->
+        <section id="section8" class="content-section" data-section="7">
+            <div class="section-inner">
+                <h1>Types of Attacks Over Time</h1>
+                <p>placeholder</p>
+            </div>
+        </section>
+
+         <!-- Section 9 -->
+        <section id="section9" class="content-section" data-section="8">
+            <div class="section-inner">
+                <h1>What Can We Do To Stop These Attacks?</h1>
+                <p>placeholder</p>
+                <p>visualization</p>
+            </div>
+        </section>
+
+         <!-- Section 10 -->
+        <section id="section10" class="content-section" data-section="9">
+            <div class="section-inner">
+                <h1>How to Protect Yourself Against Cyberattacks</h1>
+                <p>placeholder</p>
+            </div>
+        </section>
+
+         <!-- Section 11 -->
+        <section id="section11" class="content-section" data-section="10">
+            <div class="section-inner">
+                <h1>Thank You for Exploring CyberAtlas!</h1>
+                <p>CS 4460 - InfoVis</p>
+                <p>Group Members:</p>
+                <div class="name-containers">
+                    <div class="name-box">Jackson Li</div>
+                    <div class="name-box">Dmitri Morris</div>
+                    <div class="name-box">Heeba Merchant</div>
+                    <div class="name-box">Tony Nguyen</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 12 -->
+        <section id="section12" class="content-section" data-section="11">
+            <div class="section-inner">
+                <h1>Sources and Credits</h1>
+                <p>Sources and credits content goes here.</p>
             </div>
         </section>
     </main>
