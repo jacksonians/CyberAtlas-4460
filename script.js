@@ -374,35 +374,3 @@ document.addEventListener('DOMContentLoaded', function() {
         step();
     }
 });
-
-// Handle form submission in Section 2
-function handleSubmit(event) {
-    event.preventDefault();
-    const numberInput = document.getElementById('numberInput');
-    const resultMessage = document.getElementById('resultMessage');
-    const questionContent = document.getElementById('questionContent');
-    const userAnswer = parseInt(numberInput.value);
-    const correctAnswer = 2244;
-    
-    // Calculate how far off they were
-    const difference = Math.abs(userAnswer - correctAnswer);
-    
-    // Fade out the question and input
-    questionContent.classList.add('fade-out');
-    
-    // Wait for fade out animation, then show result
-    setTimeout(() => {
-        questionContent.style.display = 'none';
-        
-        // Show different message based on whether they got it right
-        if (difference === 0) {
-            resultMessage.textContent = 'Lucky guess or are you part of the organization? Either way, that was the correct answer.';
-        } else {
-            resultMessage.textContent = `Nice try. You were off by ${difference} attacks. The correct answer is ${correctAnswer}.`;
-        }
-        
-        resultMessage.classList.add('show');
-    }, 500); // Match the CSS transition duration
-    
-    return false;
-}
