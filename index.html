@@ -1,195 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CyberAtlas - Interactive Visualization</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="globevis.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="globevis.css" />
     <!-- D3.js library -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <script src="https://d3js.org/d3-geo.v1.min.js"></script>
-</head>
-<body>
-    <!-- Navigation Sidebar -->
-    <nav class="sidebar">
-        <div class="nav-container">
-            <svg class="nav-svg" width="60" height="400"></svg>
-        </div>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
+      defer
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"
+      defer
+    ></script>
+    <script src="script.js" defer></script>
+    <script src="globevis.js" defer></script>
+  </head>
+  <body>
+    <div class="background">
+      <div class="bg-gradient"></div>
+      <div class="bg-grid"></div>
+      <div class="bg-glow"></div>
+      <div class="bg-noise"></div>
+    </div>
+
+    <nav id="dot-rail" aria-label="Scene navigation">
+      <ul></ul>
     </nav>
 
-    <!-- Main Content -->
-    <main class="content">
-        <!-- Section 1 -->
-        <section id="section1" class="content-section" data-section="0">
-            <div class="section-inner">
-                <h1>Invisible Wars</h1>
-                <h2>The Global Web of Cyber Conflicts</h2>
-                <p></p>
-                <p>Explore the danger of cyberattacks and learn ways to protect yourself.</p>
-            </div>
-        </section>
+    <header class="brand">
+      <span class="brand__badge">CyberAtlas // 2024</span>
+    </header>
 
-        <!-- Section 2 -->
-        <section id="section2" class="content-section" data-section="1">
-            <div class="section-inner">
-                <div class="image-container">
-                    <img src="images/anonymous.jpg" alt="Anonymous">
+    <main id="scroller">
+      <section id="section1" class="scene">
+        <div class="container">
+          <div class="hero">
+            <div class="hero__glow" aria-hidden="true"></div>
+            <h1 class="hero__title">
+              <span class="glitch" data-text="Invisible Wars">Invisible Wars</span>
+            </h1>
+            <p class="hero__subtitle">
+              The Global Web of Cyber Conflicts. Explore the danger of cyberattacks and learn ways to protect yourself.
+            </p>
+            <div class="hero__actions">
+              <button class="btn btn--primary" type="button">Explore Data</button>
+              <button class="btn btn--ghost" type="button">Learn More</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section2" class="scene">
+        <div class="container">
+          <article class="card form-card">
+            <header>
+              <h2>Pulse Check</h2>
+              <p class="muted">Test your knowledge</p>
+            </header>
+            <div class="question-content" id="questionContent">
+              <label class="input-label" for="audience-question">
+                How many cyberattacks happen daily in the US?
+              </label>
+              <form class="question-form" onsubmit="return handleSubmit(event)">
+                <div class="input-group">
+                  <input
+                    id="audience-question"
+                    type="number"
+                    name="numberInput"
+                    placeholder="Enter your best estimate"
+                    autocomplete="off"
+                    required
+                  />
+                  <button class="btn btn--primary" type="submit">Submit Guess</button>
                 </div>
-                <div class="question-container">
-                    <div class="question-content" id="questionContent">
-                        <h1>Question.</h1>
-                        <p>How many cyberattacks occur every day in the United States?</p>
-                        <form class="question-form" onsubmit="return handleSubmit(event)">
-                            <div class="input-group">
-                                <input type="number" id="numberInput" name="numberInput" required placeholder="Answer Here">
-                                <button type="submit">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div id="resultMessage" class="result-message"></div>
-                </div>
+              </form>
             </div>
-        </section>
+            <div id="resultMessage" class="result-message"></div>
+          </article>
+        </div>
+      </section>
 
-        <!-- Section 3 -->
-        <section id="section3" class="content-section" data-section="2">
-            <div class="section-inner">
-                <h1>Global Report</h1>
-                <p>According to a study by the University of Maryland, a cyber attack occurs every 39 seconds, translating into an average of 2,244 attacks per day.</p>
-                <p>These attacks are becoming increasingly common. In Q2 of 2024, global cyberattacks have increased by 30%.</p>
+      <section id="section3" class="scene">
+        <div class="container">
+          <article class="card stats-card">
+            <header>
+              <h2>Answer &amp; Fast Facts</h2>
+              <p class="muted">Key stats from recent research</p>
+            </header>
+            <div class="chip-row">
+              <div class="chip">2,244 attacks per day</div>
+              <div class="chip">Every 39 seconds</div>
+              <div class="chip">30% increase in Q2 2024</div>
             </div>
-        </section>
+            <p style="margin-top: 1.5rem;">According to a study by the University of Maryland, a cyber attack occurs every 39 seconds, translating into an average of 2,244 attacks per day. These attacks are becoming increasingly common. In Q2 of 2024, global cyberattacks have increased by 30%.</p>
+          </article>
+        </div>
+      </section>
 
-        <!-- Section 4 -->
-        <section id="section4" class="content-section" data-section="3">
-            <div class="section-inner">
-                <h2>Global Cybersecurity Metrics</h2>
-                <p>Drag to rotate. Hover for metrics.</p>
-                <div class="card">
-                    <div id="mapVis"></div>
-                </div>
+      <section id="section4" class="scene">
+        <div class="container wide">
+          <article class="card">
+            <header>
+              <h2>Global Cybersecurity Metrics</h2>
+              <p class="muted">Drag to rotate. Hover for country metrics.</p>
+            </header>
+            <div id="mapVis"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="section5" class="scene">
+        <div class="container wide">
+          <article class="card">
+            <header>
+              <h2>One Breach Impacts More Than You Think</h2>
+              <p class="muted">Click any node to see attack propagation</p>
+            </header>
+            <p>
+              Click a node (like JFK Airport or the Power Grid) to see how a single cyber attack spreads through interconnected systems in New York City.
+            </p>
+            <div id="attackViz" style="width:100%; height:500px;"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="section6" class="scene">
+        <div class="container">
+          <article class="card card--placeholder">
+            <header>
+              <h2>Most Targeted Industries</h2>
+              <p class="muted">Discover which industries face the most threats</p>
+            </header>
+            <div class="placeholder">Industries visualization coming soon</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="section7" class="scene">
+        <div class="container">
+          <article class="card card--placeholder">
+            <header>
+              <h2>Victims of Attacks</h2>
+              <p class="muted">Explore the impact on various sectors</p>
+            </header>
+            <div class="placeholder">Victims visualization coming soon</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="section8" class="scene">
+        <div class="container split">
+          <article class="card card--placeholder">
+            <header>
+              <h2>Attack Types Over Time</h2>
+              <p class="muted">Temporal analysis</p>
+            </header>
+            <div class="placeholder">Types Area Chart</div>
+          </article>
+          <article class="card card--placeholder">
+            <header>
+              <h2>Attack Frequency</h2>
+              <p class="muted">Distribution by type</p>
+            </header>
+            <div class="placeholder">Types Bar Chart</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="section9" class="scene">
+        <div class="container">
+          <article class="card card--placeholder">
+            <header>
+              <h2>What Actually Reduces Risk</h2>
+              <p class="muted">Evidence-based interventions</p>
+            </header>
+            <div class="placeholder">Risk reduction ranking coming soon</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="section10" class="scene">
+        <div class="container">
+          <article class="card checklist-card">
+            <header>
+              <h2>Practical Steps</h2>
+              <p class="muted">Protect yourself today</p>
+            </header>
+            <ul class="checklist">
+              <li><span class="check"></span><span>Enable multi-factor authentication</span></li>
+              <li><span class="check"></span><span>Keep software updated</span></li>
+              <li><span class="check"></span><span>Use strong, unique passwords</span></li>
+              <li><span class="check"></span><span>Be cautious with email attachments</span></li>
+              <li><span class="check"></span><span>Back up important data regularly</span></li>
+              <li><span class="check"></span><span>Educate yourself on phishing</span></li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="section11" class="scene">
+        <div class="container">
+          <article class="card team-card">
+            <header>
+              <h2>The Team</h2>
+              <p class="muted">CS 4460 - Information Visualization</p>
+            </header>
+            <div class="team">
+              <div class="avatar">
+                <div class="avatar__img"></div>
+                <p>Jackson Li</p>
+                <span class="muted small">Developer</span>
+              </div>
+              <div class="avatar">
+                <div class="avatar__img"></div>
+                <p>Dmitri Morris</p>
+                <span class="muted small">Developer</span>
+              </div>
+              <div class="avatar">
+                <div class="avatar__img"></div>
+                <p>Heeba Merchant</p>
+                <span class="muted small">Developer</span>
+              </div>
+              <div class="avatar">
+                <div class="avatar__img"></div>
+                <p>Tony Nguyen</p>
+                <span class="muted small">Developer</span>
+              </div>
             </div>
-        </section>
+          </article>
+        </div>
+      </section>
 
-        <!-- Section 5 -->
-        <section id="section5" class="content-section" data-section="4">
-            <div class="section-inner">
-                <!-- Title above the visualization -->
-                <div style="text-align:center;">
-                    <h1>One Breach Impacts More Than You Think</h1>
-                </div>
-
-                <!-- Description and visualization side by side -->
-                <div class="visualization-container">
-                    <p>
-                        Click a node (like JFK Airport or the Power Grid) to see how a single cyber attack spreads through interconnected systems in New York City.
-                    </p>
-                    <div id="attackViz" style="width:100%; height:500px;"></div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- Section 6 -->
-        <section id="section6" class="content-section" data-section="5">
-            <div class="section-inner">
-                <h1>Most Targeted Industries</h1>
-                <p>Discover which industries are most frequently targeted by cyberattacks.</p>
-            </div>
-        </section>
-
-        <!-- Section 7 -->
-        <section id="section7" class="content-section" data-section="6">
-            <div class="section-inner">
-                <h1>Victims of Attacks</h1>
-                <p>Explore the impact of cyberattacks on various sectors and organizations.</p>
-            </div>
-        </section>
-
-         <!-- Section 8 -->
-        <section id="section8" class="content-section" data-section="7">
-            <div class="section-inner">
-                <h2>Types of Attacks Over Time</h2>
-                <div class="card">
-                    <div class="placeholder">
-                        <div id="vis-types-area">Attack Types Area Chart Placeholder</div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="placeholder">
-                        <div id="vis-types-bar">Attack Types Bar Chart Placeholder</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-         <!-- Section 9 -->
-        <section id="section9" class="content-section" data-section="8">
-            <div class="section-inner">
-               <h2>What Actually Reduces Risk</h2>
-                <div class="card">
-                    <div class="placeholder">
-                        <div id="vis-actions">Risk Reduction Actions Placeholder</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-         <!-- Section 10 -->
-        <section id="section10" class="content-section" data-section="9">
-            <div class="section-inner">
-                <h2>Practical Steps to Avoid Attacks</h2>
-                <div class="card">
-                    <ul>
-                        <li>Enable multi-factor authentication</li>
-                        <li>Keep software updated</li>
-                        <li>Use strong, unique passwords</li>
-                        <li>Be cautious with email attachments</li>
-                        <li>Back up important data regularly</li>
-                        <li>Educate yourself on phishing</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-         <!-- Section 11 -->
-        <section id="section11" class="content-section" data-section="10">
-            <div class="section-inner">
-                <h1>Thank You for Exploring CyberAtlas!</h1>
-                <p>CS 4460 - InfoVis</p>
-                <p>Group Members:</p>
-                <div class="name-containers">
-                    <div class="name-box">Jackson Li</div>
-                    <div class="name-box">Dmitri Morris</div>
-                    <div class="name-box">Heeba Merchant</div>
-                    <div class="name-box">Tony Nguyen</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 12 -->
-        <section id="section12" class="content-section" data-section="11">
-            <div class="section-inner">
-                <h2>Sources</h2>
-                <div class="card">
-                    <ul>
-                        <li>Global Cybersecurity Index (GCI) - ITU</li>
-                        <li>National Cybersecurity Index (NCSI)</li>
-                        <li>Cyber Exposure Index (CEI)</li>
-                        <li>Digital Development Level (DDL)</li>
-                        <li>FBI Internet Crime Report</li>
-                        <li>Verizon Data Breach Investigations Report</li>
-                        <li>IBM Cost of Data Breach Study</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+      <section id="section12" class="scene">
+        <div class="container">
+          <article class="card sources-card">
+            <header>
+              <h2>Sources</h2>
+              <p class="muted">Data references & citations</p>
+            </header>
+            <ul class="source-list">
+              <li>Global Cybersecurity Index (GCI) - ITU</li>
+              <li>National Cybersecurity Index (NCSI)</li>
+              <li>Cyber Exposure Index (CEI)</li>
+              <li>Digital Development Level (DDL)</li>
+              <li>FBI Internet Crime Report</li>
+              <li>Verizon Data Breach Investigations Report</li>
+              <li>IBM Cost of Data Breach Study</li>
+              <li>University of Maryland Cyber Attack Study</li>
+            </ul>
+          </article>
+        </div>
+      </section>
     </main>
-
-    <!-- JavaScript -->
-    <script src="script.js"></script>
-    <script src="globevis.js"></script>
-</body>
+  </body>
 </html>

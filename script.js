@@ -1,167 +1,291 @@
-// Wait for DOM to load
-document.addEventListener('DOMContentLoaded', function() {
-    // Configuration
-    const sections = document.querySelectorAll('.content-section');
-    const numSections = sections.length;
-    const circleRadius = 8;
-    const circleSpacing = 40;
-    const svgHeight = numSections * circleSpacing;
+'use strict';
 
-    // Update SVG height
-    const svg = d3.select('.nav-svg')
-        .attr('height', svgHeight);
+(function () {
+  const scroller = document.getElementById('scroller');
+  const scenes = Array.from(document.querySelectorAll('.scene'));
+  const dotRailList = document.querySelector('#dot-rail ul');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const reduceMotion = prefersReducedMotion.matches;
+  const hasGSAP = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
+  const magneticSelectors = ['.btn', '.chip'];
 
-    // Create navigation circles using D3.js
-    const navCircles = svg.selectAll('.nav-circle')
-        .data(d3.range(numSections))
-        .enter()
-        .append('g')
-        .attr('class', 'nav-circle')
-        .attr('transform', (d, i) => `translate(30, ${circleSpacing * i + 30})`)
-        .attr('data-section', d => d);
+  function buildDotRail() {
+    if (!dotRailList || !scenes.length) return;
 
-    // Add circles
-    navCircles.append('circle')
-        .attr('r', circleRadius)
-        .attr('cx', 0)
-        .attr('cy', 0);
+    const fragment = document.createDocumentFragment();
 
-    // Add numbers to circles
-    navCircles.append('text')
-        .attr('x', 0)
-        .attr('y', 4)
-        .text(d => d + 1);
+    scenes.forEach((scene, index) => {
+      const listItem = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', `Go to section ${index + 1}`);
+      button.dataset.index = String(index);
 
-    // Click handler for navigation circles
-    navCircles.on('click', function(event, d) {
-        const targetSection = document.getElementById(`section${d + 1}`);
-        if (targetSection) {
-            targetSection.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const targetScene = scenes[index];
+        if (!targetScene) return;
+
+        targetScene.scrollIntoView({
+          behavior: reduceMotion ? 'auto' : 'smooth',
+          block: 'start'
+        });
+        setActiveScene(index);
+      });
+
+      listItem.appendChild(button);
+      fragment.appendChild(listItem);
     });
 
-    // Scroll detection logic
-    let ticking = false;
+    dotRailList.appendChild(fragment);
+  }
 
-    function updateActiveCircle() {
-        const scrollPosition = window.scrollY + window.innerHeight / 2;
-        let activeIndex = 0;
+  function getDots() {
+    return Array.from(dotRailList.querySelectorAll('button'));
+  }
 
-        // Find which section is currently in view
-        sections.forEach((section, index) => {
-            const sectionTop = section.offsetTop;
-            const sectionBottom = sectionTop + section.offsetHeight;
+  function clearActive() {
+    getDots().forEach((dot) => dot.classList.remove('active'));
+    scenes.forEach((scene) => scene.classList.remove('is-active'));
+  }
 
-            if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-                activeIndex = index;
-            }
-        });
+  function setActiveScene(index) {
+    clearActive();
+    const dots = getDots();
+    const scene = scenes[index];
+    if (dots[index]) {
+      dots[index].classList.add('active');
+    }
+    if (scene) {
+      scene.classList.add('is-active');
+    }
+  }
 
-        // Update active circle
-        navCircles.classed('active', function(d) {
-            return d === activeIndex;
-        });
-
-        ticking = false;
+  function setupIntersectionHighlight() {
+    if (hasGSAP && !reduceMotion) {
+      // ScrollTrigger handles active states when enabled.
+      return;
     }
 
-    // Throttled scroll handler
-    function onScroll() {
-        if (!ticking) {
-            window.requestAnimationFrame(updateActiveCircle);
-            ticking = true;
-        }
-    }
-
-    // Add scroll event listener
-    window.addEventListener('scroll', onScroll);
-
-    // Initialize - set first circle as active
-    updateActiveCircle();
-
-    // Add hover effects with D3
-    navCircles
-        .on('mouseenter', function() {
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr('transform', function() {
-                    const currentTransform = d3.select(this).attr('transform');
-                    const match = currentTransform.match(/translate\((\d+),\s*(\d+)\)/);
-                    if (match) {
-                        return `translate(${match[1]}, ${match[2]}) scale(1.2)`;
-                    }
-                    return currentTransform;
-                });
-        })
-        .on('mouseleave', function() {
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr('transform', function() {
-                    const currentTransform = d3.select(this).attr('transform');
-                    const match = currentTransform.match(/translate\((\d+),\s*(\d+)\)/);
-                    if (match) {
-                        return `translate(${match[1]}, ${match[2]})`;
-                    }
-                    return currentTransform;
-                });
-        });
-
-    // Handle window resize
-    let resizeTimeout;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function() {
-            updateActiveCircle();
-        }, 250);
-    });
-
-    document.addEventListener('keydown', function(e) {
-        const activeCircle = document.querySelector('.nav-circle.active');
-        if (!activeCircle) return;
-
-        const currentIndex = parseInt(activeCircle.getAttribute('data-section'));
-        let targetIndex;
-
-        // Arrow Up or Page Up
-        if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-            e.preventDefault();
-            targetIndex = Math.max(0, currentIndex - 1);
-        }
-        // Arrow Down or Page Down
-        else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-            e.preventDefault();
-            targetIndex = Math.min(numSections - 1, currentIndex + 1);
-        }
-        // Home key
-        else if (e.key === 'Home') {
-            e.preventDefault();
-            targetIndex = 0;
-        }
-        // End key
-        else if (e.key === 'End') {
-            e.preventDefault();
-            targetIndex = numSections - 1;
-        }
-
-        if (targetIndex !== undefined) {
-            const targetSection = document.getElementById(`section${targetIndex + 1}`);
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = scenes.indexOf(entry.target);
+            if (index !== -1) {
+              setActiveScene(index);
             }
+          }
+        });
+      },
+      {
+        root: null,
+        threshold: 0.4
+      }
+    );
+
+    scenes.forEach((scene) => observer.observe(scene));
+  }
+
+  function revealFallback() {
+    document
+      .querySelectorAll('.card, .chip, .scene .placeholder, .checklist li, .source-list li, .avatar')
+      .forEach((el) => {
+        el.style.transform = 'none';
+        el.style.opacity = '1';
+        el.style.filter = 'none';
+      });
+  }
+
+  function setupMagnetic() {
+    if (reduceMotion || !magneticSelectors.length) return;
+
+    const magnetElements = document.querySelectorAll(magneticSelectors.join(','));
+    magnetElements.forEach((element) => {
+      const strength = element.classList.contains('chip') ? 4 : 8;
+      const animationEase = { duration: 0.4, ease: 'power3.out' };
+
+      element.addEventListener('pointerenter', () => {
+        element.dataset.magnet = 'true';
+      });
+
+      element.addEventListener('pointermove', (event) => {
+        if (element.dataset.magnet !== 'true') return;
+        const rect = element.getBoundingClientRect();
+        const offsetX = ((event.clientX - rect.left) / rect.width - 0.5) * strength;
+        const offsetY = ((event.clientY - rect.top) / rect.height - 0.5) * strength;
+
+        if (hasGSAP) {
+          gsap.to(element, { x: offsetX, y: offsetY, ...animationEase });
+        } else {
+          element.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
         }
+      });
+
+      element.addEventListener('pointerleave', () => {
+        delete element.dataset.magnet;
+        if (hasGSAP) {
+          gsap.to(element, { x: 0, y: 0, ...animationEase });
+        } else {
+          element.style.transform = 'translate(0, 0)';
+        }
+      });
+    });
+  }
+
+  function setupParallax() {
+    if (!hasGSAP || reduceMotion) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+    const layers = ['.bg-gradient', '.bg-glow', '.bg-grid'];
+    layers.forEach((selector, index) => {
+      const amplitude = index === 2 ? 4 : 8;
+      gsap.to(selector, {
+        yPercent: index % 2 === 0 ? amplitude : -amplitude,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: scroller,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true
+        }
+      });
+    });
+  }
+
+  function setupSceneAnimations() {
+    if (!hasGSAP || reduceMotion) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    scenes.forEach((scene, index) => {
+      if (index === 0) {
+        ScrollTrigger.create({
+          trigger: scene,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => setActiveScene(index),
+          onEnterBack: () => setActiveScene(index)
+        });
+        return;
+      }
+
+      const cards = scene.querySelectorAll('.card');
+      const headings = scene.querySelectorAll('h1, h2, h3');
+      const paragraph = scene.querySelectorAll('p:not(.muted)');
+      const chips = scene.querySelectorAll('.chip');
+      const misc = scene.querySelectorAll('.placeholder, .checklist li, .source-list li, .avatar');
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: scene,
+          start: 'top center',
+          end: 'bottom center',
+          toggleActions: 'play none none reverse',
+          onEnter: () => setActiveScene(index),
+          onEnterBack: () => setActiveScene(index)
+        },
+        defaults: { ease: 'power3.out' }
+      });
+
+      if (headings.length) {
+        tl.fromTo(
+          headings,
+          { y: 26, opacity: 0, filter: 'blur(14px)' },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.08 }
+        );
+      }
+
+      if (paragraph.length) {
+        tl.fromTo(
+          paragraph,
+          { y: 20, opacity: 0, filter: 'blur(10px)' },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, stagger: 0.06 },
+          '-=0.5'
+        );
+      }
+
+      if (cards.length) {
+        tl.to(
+          cards,
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.8,
+            stagger: 0.12
+          },
+          '-=0.6'
+        );
+      }
+
+      if (chips.length) {
+        tl.to(
+          chips,
+          {
+            y: 0,
+            opacity: 1,
+            filter: 'blur(0px)',
+            duration: 0.5,
+            stagger: 0.08
+          },
+          '-=0.5'
+        );
+      }
+
+      if (misc.length) {
+        tl.to(
+          misc,
+          {
+            y: 0,
+            opacity: 1,
+            filter: 'blur(0px)',
+            duration: 0.6,
+            stagger: 0.08
+          },
+          '-=0.5'
+        );
+      }
     });
 
-    console.log('CyberAtlas navigation initialized with', numSections, 'sections');
+    // Hero entrance sequence
+    const hero = document.querySelector('.hero');
+    if (hero) {
+      const heroTimeline = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.2 });
+      heroTimeline.from(hero, { y: 50, opacity: 0, duration: 1 });
+      heroTimeline.from(
+        hero.querySelectorAll('.hero__title, .hero__subtitle, .hero__actions .btn'),
+        { y: 30, opacity: 0, filter: 'blur(10px)', duration: 0.8, stagger: 0.1 },
+        '-=0.6'
+      );
+    }
+  }
 
+  function initGlitch() {
+    const glitch = document.querySelector('.glitch');
+    if (!glitch) return;
+    const minDelay = 0.1;
+    const maxDelay = 0.4;
+    const randomDelay = (Math.random() * (maxDelay - minDelay) + minDelay).toFixed(2);
+    glitch.style.setProperty('--glitch-delay', `${randomDelay}s`);
 
+    if (reduceMotion) return;
+
+    setInterval(() => {
+      glitch.classList.remove('active');
+      // Trigger reflow to restart animation
+      void glitch.offsetWidth; // eslint-disable-line no-unused-expressions
+      glitch.classList.add('active');
+    }, 10000);
+
+    glitch.classList.add('active');
+  }
+
+  // Connected Nodes Attack Visualization (from CyberAtlas)
+  function initAttackVisualization() {
+    const attackVizContainer = document.getElementById('attackViz');
+    if (!attackVizContainer) return;
 
     const width = 800, height = 600;
     const attackSvg = d3.select("#attackViz").append("svg")
@@ -190,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: "Columbia University", type: "education" },
         { id: "Police Department", type: "security" },
         { id: "Fire Department", type: "security" },
-        { id: "City Hall (Gov’t)", type: "government" },
+        { id: "City Hall (Gov't)", type: "government" },
         { id: "Wall Street (Finance Hub)", type: "finance" },
         { id: "Media Networks", type: "media" },
         { id: "Cell Towers", type: "communication" },
@@ -204,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ["New York City", "Internet Backbone"],
         ["New York City", "Subway System"],
         ["New York City", "Wall Street (Finance Hub)"],
-        ["New York City", "City Hall (Gov’t)"],
+        ["New York City", "City Hall (Gov't)"],
         ["Power Grid (Con Edison)", "Water Supply System"],
         ["Power Grid (Con Edison)", "Internet Backbone"],
         ["Power Grid (Con Edison)", "Cell Towers"],
@@ -223,8 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ["Subway System", "Power Grid (Con Edison)"],
         ["Bus Network", "Subway System"],
         ["Traffic Control System", "Subway System"],
-        ["Police Department", "City Hall (Gov’t)"],
-        ["Fire Department", "City Hall (Gov’t)"],
+        ["Police Department", "City Hall (Gov't)"],
+        ["Fire Department", "City Hall (Gov't)"],
         ["Emergency Call Centers (911)", "Internet Backbone"],
         ["Emergency Call Centers (911)", "Cell Towers"],
         ["Emergency Call Centers (911)", "Police Department"],
@@ -237,8 +361,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ["Columbia University", "Power Grid (Con Edison)"],
         ["Wall Street (Finance Hub)", "Power Grid (Con Edison)"],
         ["Wall Street (Finance Hub)", "Internet Backbone"],
-        ["City Hall (Gov’t)", "Internet Backbone"],
-        ["City Hall (Gov’t)", "Power Grid (Con Edison)"]
+        ["City Hall (Gov't)", "Internet Backbone"],
+        ["City Hall (Gov't)", "Power Grid (Con Edison)"]
     ].map(d => ({ source: d[0], target: d[1] }));
 
     const propagationRules = {
@@ -301,9 +425,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .attr("font-size", "10px")
         .attr("text-anchor", "middle")
         .attr("pointer-events", "none")
+        .attr("fill", "#e6edf7")
         .attr("dy", -20);
-
-    document.getElementById("statusText").textContent = "Status: idle";
 
     function ticked() {
         linkElems
@@ -341,7 +464,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function step() {
             if (queue.length === 0) {
-                document.getElementById("statusText").textContent = "Propagation complete.";
                 return;
             }
             const current = queue.shift();
@@ -372,13 +494,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
         step();
     }
+  }
 
-});
+  function init() {
+    buildDotRail();
+    setActiveScene(0);
+    setupIntersectionHighlight();
+    setupMagnetic();
+    initGlitch();
+    initAttackVisualization();
 
-// Handle form submission in Section 2
+    if (!hasGSAP || reduceMotion) {
+      revealFallback();
+      return;
+    }
+
+    setupParallax();
+    setupSceneAnimations();
+  }
+
+  if (!scenes.length || !scroller) return;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  prefersReducedMotion.addEventListener('change', () => {
+    window.location.reload();
+  });
+})();
+
+// Handle form submission for question (from CyberAtlas)
 function handleSubmit(event) {
     event.preventDefault();
-    const numberInput = document.getElementById('numberInput');
+    const numberInput = document.getElementById('audience-question');
     const resultMessage = document.getElementById('resultMessage');
     const questionContent = document.getElementById('questionContent');
     const userAnswer = parseInt(numberInput.value);
@@ -396,9 +547,9 @@ function handleSubmit(event) {
         
         // Show different message based on whether they got it right
         if (difference === 0) {
-            resultMessage.textContent = 'Lucky guess or are you part of the organization? Either way, that is the correct answer.';
+            resultMessage.textContent = 'Perfect! Lucky guess or are you part of the organization? That is the correct answer.';
         } else {
-            resultMessage.textContent = `Nice try. You were off by ${difference} attacks. The correct answer is ${correctAnswer}.`;
+            resultMessage.textContent = `Nice try. You were off by ${difference.toLocaleString()} attacks. The correct answer is ${correctAnswer.toLocaleString()} attacks per day.`;
         }
         
         resultMessage.classList.add('show');
