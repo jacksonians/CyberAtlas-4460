@@ -28,8 +28,8 @@
 
         targetScene.scrollIntoView({
           behavior: reduceMotion ? 'auto' : 'smooth',
-          block: 'start'
-        });
+                block: 'start'
+            });
         setActiveScene(index);
       });
 
