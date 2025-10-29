@@ -493,7 +493,6 @@
         step();
     }
   }
-// Visualization for Most Targeted Industries (Section 6)
     function initIndustryVisualization() {
         const industryContainer = document.querySelector('#section6 .placeholder');
         if (!industryContainer) return;
@@ -502,140 +501,143 @@
         industryContainer.innerHTML = '';
 
         const width = 700;
-        const height = 400;
-        const margin = { top: 40, right: 30, bottom: 60, left: 140 };
+        const height = 500;
+        const margin = { top: 60, right: 40, bottom: 100, left: 80 };
 
-        // Create SVG
         const svg = d3.select(industryContainer)
             .append('svg')
             .attr('width', width)
             .attr('height', height);
 
-        // Tooltip
-        // Create tooltip attached to body instead of container
+        const chartArea = svg.append('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
         const tooltip = d3.select('body')
             .append('div')
             .attr('class', 'tooltip')
-            .style('position', 'fixed')  // Changed from absolute to fixed
+            .style('position', 'fixed')
             .style('background', '#1e1e2f')
             .style('color', '#e6edf7')
             .style('padding', '8px 12px')
             .style('border-radius', '6px')
             .style('font-size', '13px')
             .style('max-width', '240px')
-            .style('line-height', '1.4')
             .style('pointer-events', 'none')
-            .style('z-index', '1000')  // Add z-index
+            .style('z-index', '1000')
             .style('opacity', 0);
 
-        // Dataset with impact text
-        const data = [
-            { industry: 'Finance', attacks: 38, impact: 'Financial breaches can drain citizens’ savings and compromise credit data.' },
-            { industry: 'Healthcare', attacks: 32, impact: 'Attacks can expose medical records, delay treatments, and endanger lives.' },
-            { industry: 'Education', attacks: 25, impact: 'Schools face class disruptions and data leaks affecting students and parents.' },
-            { industry: 'Manufacturing', attacks: 22, impact: 'Interrupts supply chains, raising prices and delaying goods for everyone.' },
-            { industry: 'Government', attacks: 20, impact: 'Can leak citizen data and disrupt essential public services and benefits.' },
-            { industry: 'Energy', attacks: 17, impact: 'Leads to power outages, fuel shortages, and national security risks.' },
-            { industry: 'Retail', attacks: 15, impact: 'Compromises customer payment data and causes widespread identity theft.' },
-            { industry: 'Technology', attacks: 12, impact: 'Exposes sensitive data that fuels scams, fake accounts, and misinformation.' }
-        ];
+        // Load your CSV file
+        d3.csv('data/DefenseTypes_IndustryTargeted_TypeOfAttack.csv').then(rawData => {
+            // Count how many attacks per industry
+            const industryCounts = d3.rollups(
+                rawData,
+                v => v.length,
+                d => d.industry
+            ).map(([industry, attacks]) => ({ industry, attacks }));
 
-        // Scales
-        const x = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.attacks)])
-            .range([margin.left, width - margin.right]);
+            // ✅ Sort industries by number of attacks (descending)
+            industryCounts.sort((a, b) => d3.descending(a.attacks, b.attacks));
 
-        const y = d3.scaleBand()
-            .domain(data.map(d => d.industry))
-            .range([margin.top, height - margin.bottom])
-            .padding(0.15);
+            // Tooltip impact descriptions
+            const impactText = {
+                'Finance': 'Financial breaches can drain citizens’ savings and compromise credit data.',
+                'Healthcare': 'Attacks can expose medical records, delay treatments, and endanger lives.',
+                'Education': 'Schools face class disruptions and leaks affecting students and parents.',
+                'Manufacturing': 'Interrupts supply chains, raising prices and delaying goods.',
+                'Government': 'Can leak citizen data and disrupt essential public services.',
+                'Energy': 'Leads to outages, fuel shortages, and national security risks.',
+                'Retail': 'Compromises payment data, causing identity theft and fraud.',
+                'Technology': 'Exposes personal data that fuels scams and misinformation.'
+            };
 
-        // Axes
-        svg.append('g')
-            .attr('class', 'x-axis')
-            .attr('transform', `translate(0,${height - margin.bottom})`)
-            .call(d3.axisBottom(x).ticks(5))
-            .attr('color', '#e6edf7');
+            const x = d3.scaleBand()
+                .domain(industryCounts.map(d => d.industry))
+                .range([0, width - margin.left - margin.right])
+                .padding(0.3);
 
-        svg.append('g')
-            .attr('class', 'y-axis')
-            .attr('transform', `translate(${margin.left},0)`)
-            .call(d3.axisLeft(y))
-            .attr('color', '#e6edf7');
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(industryCounts, d => d.attacks)])
+                .nice()
+                .range([height - margin.top - margin.bottom, 0]);
 
-        // Bars
-        const bars = svg.selectAll('.bar')
-            .data(data)
-            .enter()
-            .append('rect')
-            .attr('class', 'bar')
-            .attr('x', margin.left)
-            .attr('y', d => y(d.industry))
-            .attr('height', y.bandwidth())
-            .attr('width', 0)
-            .attr('fill', '#2f80ed')
-            .style('cursor', 'pointer')
-            .on('mouseover', function (event, d) {
-                d3.select(this).attr('fill', '#f2c94c');
-                tooltip.transition().duration(150).style('opacity', 1);
-                tooltip.html(`<strong>${d.industry}</strong><br>${d.impact}`)
-                    .style('left', event.pageX + 12 + 'px')
-                    .style('top', event.pageY - 40 + 'px');
-            })
-            .on('mouseover', function (event, d) {
-                d3.select(this).attr('fill', '#f2c94c');
-                tooltip.transition().duration(150).style('opacity', 1);
-                tooltip.html(`<strong>${d.industry}</strong><br>${d.impact}`)
-                    .style('left', event.clientX + 12 + 'px')  // Changed from pageX
-                    .style('top', event.clientY - 40 + 'px');   // Changed from pageY
-            })
-            .on('mousemove', event => {
-                tooltip.style('left', event.clientX + 12 + 'px')
-                    .style('top', event.clientY - 40 + 'px');
-            })
-            .on('mouseout', function () {
-                d3.select(this).attr('fill', '#2f80ed');
-                tooltip.transition().duration(200).style('opacity', 0);
-            })
-        svg.on('mouseleave', function() {
-            tooltip.transition().duration(200).style('opacity', 0);
+            const color = d3.scaleOrdinal()
+                .domain(industryCounts.map(d => d.industry))
+                .range(d3.schemeTableau10);
+
+            chartArea.selectAll('.bar')
+                .data(industryCounts)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => x(d.industry))
+                .attr('y', d => y(d.attacks))
+                .attr('width', x.bandwidth())
+                .attr('height', d => height - margin.top - margin.bottom - y(d.attacks))
+                .attr('fill', d => color(d.industry))
+                .style('cursor', 'pointer')
+                .on('mouseover', function (event, d) {
+                    d3.select(this).attr('opacity', 0.8);
+                    tooltip.transition().duration(150).style('opacity', 1);
+                    tooltip.html(
+                        `<strong>${d.industry}</strong><br>
+                     Attacks: ${d.attacks}<br>
+                     <em>${impactText[d.industry] || 'Impacts citizens through data exposure and service disruption.'}</em>`
+                    )
+                        .style('left', event.clientX + 12 + 'px')
+                        .style('top', event.clientY - 40 + 'px');
+                })
+                .on('mousemove', event => {
+                    tooltip.style('left', event.clientX + 12 + 'px')
+                        .style('top', event.clientY - 40 + 'px');
+                })
+                .on('mouseout', function () {
+                    d3.select(this).attr('opacity', 1);
+                    tooltip.transition().duration(200).style('opacity', 0);
+                });
+
+            // X axis
+            chartArea.append('g')
+                .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-40)')
+                .style('text-anchor', 'end')
+                .attr('fill', '#e6edf7');
+
+            // Y axis
+            chartArea.append('g')
+                .call(d3.axisLeft(y))
+                .selectAll('text')
+                .attr('fill', '#e6edf7');
+
+            // Axis labels
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', height - 20)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#e6edf7')
+                .attr('font-size', '14px')
+                .text('Industry');
+
+            svg.append('text')
+                .attr('x', -height / 2)
+                .attr('y', 25)
+                .attr('transform', 'rotate(-90)')
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#e6edf7')
+                .attr('font-size', '14px')
+                .text('Number of Attacks');
+
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#e6edf7')
+                .attr('font-size', '18px')
+                .text('Cyber Attacks by Industry');
         });
-        // Labels
-        const labels = svg.selectAll('.label')
-            .data(data)
-            .enter()
-            .append('text')
-            .attr('class', 'label')
-            .attr('x', margin.left)
-            .attr('y', d => y(d.industry) + y.bandwidth() / 2)
-            .attr('dy', '0.35em')
-            .attr('fill', '#e6edf7')
-            .attr('font-size', '12px')
-            .attr('opacity', 0)
-            .text(d => `${d.attacks}`);
-
-        // Animate on scroll into view
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    bars.transition()
-                        .duration(1200)
-                        .delay((d, i) => i * 100)
-                        .attr('width', d => x(d.attacks) - margin.left);
-
-                    labels.transition()
-                        .duration(1200)
-                        .delay((d, i) => i * 100)
-                        .attr('x', d => x(d.attacks) + 8)
-                        .attr('opacity', 1);
-
-                    observer.disconnect();
-                }
-            });
-        }, { threshold: 0.4 });
-
-        observer.observe(industryContainer);
     }
+
 
   function init() {
     buildDotRail();
