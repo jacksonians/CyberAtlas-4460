@@ -1254,3 +1254,21 @@ body::after {
     animation: none;
     }
 }
+#section6 svg {
+    font-family: 'Inter', sans-serif;
+}
+
+.bar:hover {
+    filter: drop-shadow(0 0 10px #f2c94c);
+    transition: filter 0.2s ease, fill 0.2s ease;
+}
+
+.tooltip {
+    box-shadow: 0 0 12px rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+
+.label {
+    pointer-events: none;
+    font-weight: 500;
+}

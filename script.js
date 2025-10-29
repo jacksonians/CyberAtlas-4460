@@ -307,7 +307,6 @@
         { id: "JFK Airport", type: "airport" },
         { id: "LaGuardia Airport", type: "airport" },
         { id: "Subway System", type: "transit" },
-        { id: "Bus Network", type: "transit" },
         { id: "Mount Sinai Hospital", type: "hospital" },
         { id: "NYU Langone Hospital", type: "hospital" },
         { id: "NYC Public Schools", type: "school" },
@@ -345,7 +344,6 @@
         ["JFK Airport", "Internet Backbone"],
         ["LaGuardia Airport", "Internet Backbone"],
         ["Subway System", "Power Grid (Con Edison)"],
-        ["Bus Network", "Subway System"],
         ["Traffic Control System", "Subway System"],
         ["Police Department", "City Hall (Gov't)"],
         ["Fire Department", "City Hall (Gov't)"],
@@ -495,6 +493,149 @@
         step();
     }
   }
+// Visualization for Most Targeted Industries (Section 6)
+    function initIndustryVisualization() {
+        const industryContainer = document.querySelector('#section6 .placeholder');
+        if (!industryContainer) return;
+
+        // Remove placeholder
+        industryContainer.innerHTML = '';
+
+        const width = 700;
+        const height = 400;
+        const margin = { top: 40, right: 30, bottom: 60, left: 140 };
+
+        // Create SVG
+        const svg = d3.select(industryContainer)
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        // Tooltip
+        // Create tooltip attached to body instead of container
+        const tooltip = d3.select('body')
+            .append('div')
+            .attr('class', 'tooltip')
+            .style('position', 'fixed')  // Changed from absolute to fixed
+            .style('background', '#1e1e2f')
+            .style('color', '#e6edf7')
+            .style('padding', '8px 12px')
+            .style('border-radius', '6px')
+            .style('font-size', '13px')
+            .style('max-width', '240px')
+            .style('line-height', '1.4')
+            .style('pointer-events', 'none')
+            .style('z-index', '1000')  // Add z-index
+            .style('opacity', 0);
+
+        // Dataset with impact text
+        const data = [
+            { industry: 'Finance', attacks: 38, impact: 'Financial breaches can drain citizens’ savings and compromise credit data.' },
+            { industry: 'Healthcare', attacks: 32, impact: 'Attacks can expose medical records, delay treatments, and endanger lives.' },
+            { industry: 'Education', attacks: 25, impact: 'Schools face class disruptions and data leaks affecting students and parents.' },
+            { industry: 'Manufacturing', attacks: 22, impact: 'Interrupts supply chains, raising prices and delaying goods for everyone.' },
+            { industry: 'Government', attacks: 20, impact: 'Can leak citizen data and disrupt essential public services and benefits.' },
+            { industry: 'Energy', attacks: 17, impact: 'Leads to power outages, fuel shortages, and national security risks.' },
+            { industry: 'Retail', attacks: 15, impact: 'Compromises customer payment data and causes widespread identity theft.' },
+            { industry: 'Technology', attacks: 12, impact: 'Exposes sensitive data that fuels scams, fake accounts, and misinformation.' }
+        ];
+
+        // Scales
+        const x = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.attacks)])
+            .range([margin.left, width - margin.right]);
+
+        const y = d3.scaleBand()
+            .domain(data.map(d => d.industry))
+            .range([margin.top, height - margin.bottom])
+            .padding(0.15);
+
+        // Axes
+        svg.append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(0,${height - margin.bottom})`)
+            .call(d3.axisBottom(x).ticks(5))
+            .attr('color', '#e6edf7');
+
+        svg.append('g')
+            .attr('class', 'y-axis')
+            .attr('transform', `translate(${margin.left},0)`)
+            .call(d3.axisLeft(y))
+            .attr('color', '#e6edf7');
+
+        // Bars
+        const bars = svg.selectAll('.bar')
+            .data(data)
+            .enter()
+            .append('rect')
+            .attr('class', 'bar')
+            .attr('x', margin.left)
+            .attr('y', d => y(d.industry))
+            .attr('height', y.bandwidth())
+            .attr('width', 0)
+            .attr('fill', '#2f80ed')
+            .style('cursor', 'pointer')
+            .on('mouseover', function (event, d) {
+                d3.select(this).attr('fill', '#f2c94c');
+                tooltip.transition().duration(150).style('opacity', 1);
+                tooltip.html(`<strong>${d.industry}</strong><br>${d.impact}`)
+                    .style('left', event.pageX + 12 + 'px')
+                    .style('top', event.pageY - 40 + 'px');
+            })
+            .on('mouseover', function (event, d) {
+                d3.select(this).attr('fill', '#f2c94c');
+                tooltip.transition().duration(150).style('opacity', 1);
+                tooltip.html(`<strong>${d.industry}</strong><br>${d.impact}`)
+                    .style('left', event.clientX + 12 + 'px')  // Changed from pageX
+                    .style('top', event.clientY - 40 + 'px');   // Changed from pageY
+            })
+            .on('mousemove', event => {
+                tooltip.style('left', event.clientX + 12 + 'px')
+                    .style('top', event.clientY - 40 + 'px');
+            })
+            .on('mouseout', function () {
+                d3.select(this).attr('fill', '#2f80ed');
+                tooltip.transition().duration(200).style('opacity', 0);
+            })
+        svg.on('mouseleave', function() {
+            tooltip.transition().duration(200).style('opacity', 0);
+        });
+        // Labels
+        const labels = svg.selectAll('.label')
+            .data(data)
+            .enter()
+            .append('text')
+            .attr('class', 'label')
+            .attr('x', margin.left)
+            .attr('y', d => y(d.industry) + y.bandwidth() / 2)
+            .attr('dy', '0.35em')
+            .attr('fill', '#e6edf7')
+            .attr('font-size', '12px')
+            .attr('opacity', 0)
+            .text(d => `${d.attacks}`);
+
+        // Animate on scroll into view
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    bars.transition()
+                        .duration(1200)
+                        .delay((d, i) => i * 100)
+                        .attr('width', d => x(d.attacks) - margin.left);
+
+                    labels.transition()
+                        .duration(1200)
+                        .delay((d, i) => i * 100)
+                        .attr('x', d => x(d.attacks) + 8)
+                        .attr('opacity', 1);
+
+                    observer.disconnect();
+                }
+            });
+        }, { threshold: 0.4 });
+
+        observer.observe(industryContainer);
+    }
 
   function init() {
     buildDotRail();
@@ -503,7 +644,7 @@
     setupMagnetic();
     initGlitch();
     initAttackVisualization();
-
+    initIndustryVisualization()
     if (!hasGSAP || reduceMotion) {
       revealFallback();
       return;
