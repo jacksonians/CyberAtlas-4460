@@ -219,12 +219,40 @@
 
       <section id="section9" class="scene">
         <div class="container">
-          <article class="card card--placeholder">
+          <article class="card">
             <header>
               <h2>What Actually Reduces Risk</h2>
               <p class="muted">Evidence-based interventions</p>
             </header>
-            <div class="placeholder">Risk reduction ranking coming soon</div>
+            <div class="network-wrapper">
+              <div class="network-description">
+                <p>Association network showing attack types (left) and security tools (right). Link thickness and color represent association strength relative to chance. All pairs are shown.</p>
+              </div>
+              <div class="network-controls">
+                <div class="control-group">
+                  <label for="network-industry">Filter by industry</label>
+                  <select id="network-industry">
+                    <option value="all">All industries</option>
+                  </select>
+                </div>
+                <button id="network-reset" class="reset-btn">Reset</button>
+              </div>
+              <div id="attack-tool-network" class="network-container">
+                <div class="network-labels">
+                  <div class="side-label left">Attack Types</div>
+                  <div class="side-label right">Security Tools</div>
+                </div>
+              </div>
+              <div class="network-legend">
+                <div class="legend-row">
+                  <span class="legend-title">Association strength</span>
+                  <div class="legend-bar network-gradient"></div>
+                  <span class="legend-min">Under-expected</span>
+                  <span class="legend-mid">Expected</span>
+                  <span class="legend-max">Over-expected</span>
+                </div>
+              </div>
+            </div>
           </article>
         </div>
       </section>

@@ -1272,3 +1272,40 @@ body::after {
     pointer-events: none;
     font-weight: 500;
 }
+
+/* ===== ATTACK–TOOL BIPARTITE NETWORK ===== */
+.network-wrapper { padding: 1.5rem 0; }
+.network-description { text-align: center; color: var(--text-secondary); margin-bottom: 1.25rem; }
+.network-controls { display: flex; gap: 1rem; justify-content: center; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+.network-controls .control-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.network-controls select { background: rgba(15,23,42,0.6); border: 1px solid rgba(102,224,255,0.3); border-radius: 8px; color: var(--text-primary); padding: 0.5rem 0.75rem; }
+
+.network-container { background: rgba(15,23,42,0.4); border: 1px solid rgba(102,224,255,0.15); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(10px); position: relative; min-height: 520px; display: flex; justify-content: center; align-items: center; overflow: visible; }
+.network-container::before { content:''; position:absolute; inset:0; border-radius:16px; background: linear-gradient(135deg, rgba(102,224,255,0.03), rgba(168,137,255,0.03)); pointer-events:none; }
+.network-container svg { position: relative; z-index: 1; }
+
+.network-labels { position: absolute; top: 20px; left: 0; right: 0; display: flex; justify-content: space-between; pointer-events: none; z-index: 2; }
+.side-label { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); padding: 0.5rem 1rem; background: rgba(15,23,42,0.8); border-radius: 8px; border: 1px solid rgba(102,224,255,0.3); }
+.side-label.left { color: #FF6B9D; }
+.side-label.right { color: #6BFFA8; }
+
+.network-legend { margin-top: 1rem; display: flex; justify-content: center; }
+.network-legend .legend-row { display: grid; grid-template-columns: auto 240px auto auto auto; gap: 0.5rem; align-items: center; color: var(--text-secondary); }
+.network-legend .network-gradient { height: 10px; border-radius: 6px; border: 1px solid rgba(102,224,255,0.25); background: linear-gradient(90deg, rgba(102,224,255,0.25) 0%, rgba(255,255,255,0.15) 50%, rgba(168,137,255,0.8) 100%); box-shadow: 0 0 10px rgba(102,224,255,0.15); }
+.network-legend .legend-title { font-size: 0.9rem; color: var(--text-primary); margin-right: 0.5rem; }
+.network-legend .legend-min, .network-legend .legend-mid, .network-legend .legend-max { font-size: 0.8rem; }
+
+/* Network nodes */
+.network-node { cursor: pointer; transition: all 0.3s ease; }
+.network-node.attack { fill: #FF6B9D; stroke: rgba(255,107,157,0.5); }
+.network-node.tool { fill: #6BFFA8; stroke: rgba(107,255,168,0.5); }
+.network-node:hover { stroke-width: 3; filter: brightness(1.2); }
+
+.network-node-label { font-size: 11px; font-weight: 500; text-anchor: middle; dominant-baseline: middle; pointer-events: none; fill: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.7); }
+
+/* Network links */
+.network-link { stroke-opacity: 0.6; fill: none; }
+.network-link.hover { stroke-opacity: 1; stroke-width: 3; }
+
+.network-tooltip { position: absolute; background: rgba(15,23,42,0.98); border: 1px solid rgba(102,224,255,0.4); border-radius: 12px; padding: 0.9rem 1rem; font-size: 0.88rem; color: var(--text-primary); pointer-events: none; opacity: 0; transition: opacity 0.2s ease; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(102,224,255,0.2); z-index: 1000; }
+.network-tooltip.show { opacity: 1; }

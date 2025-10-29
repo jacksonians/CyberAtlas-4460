@@ -700,3 +700,180 @@ function handleSubmit(event) {
     
     return false;
 }
+
+// ===== ATTACK–TOOL BIPARTITE NETWORK (Lift/PMI) =====
+(function () {
+  const container = d3.select('#attack-tool-network');
+  if (container.empty()) return;
+
+  const width = 820;
+  const height = 520;
+  const margin = { top: 60, right: 40, bottom: 40, left: 40 };
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
+
+  const svg = container
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const tooltip = d3.select('body')
+    .append('div')
+    .attr('class', 'network-tooltip');
+
+  const industrySelect = d3.select('#network-industry');
+  const resetBtn = d3.select('#network-reset');
+
+  // Diverging color scale: under-expected -> neutral -> over-expected
+  const colorUnder = d3.rgb(102, 224, 255, 0.25); // cyan, faint
+  const colorOver = d3.rgb(168, 137, 255, 0.85); // purple, strong
+  const assocColor = d3.scaleDiverging([-0.5, 0, 0.8], t =>
+    d3.interpolateRgb(colorUnder, colorOver)(d3.scaleLinear().domain([-0.5, 0.8]).range([0, 1])(t))
+  );
+
+  fetch('data/DefenseTypes_IndustryTargeted_TypeOfAttack.csv')
+    .then(r => r.text())
+    .then(csvText => {
+      const rows = d3.csvParse(csvText);
+
+      const allIndustries = Array.from(new Set(rows.map(d => d.industry))).sort();
+      allIndustries.forEach(ind => industrySelect.append('option').attr('value', ind).text(ind));
+
+      function computeAssociation(filteredRows) {
+        const attacks = Array.from(new Set(filteredRows.map(d => d.attack_type))).sort();
+        const tools = Array.from(new Set(filteredRows.map(d => d.security_tools_used))).sort();
+
+        const n = filteredRows.length;
+        const attackCount = d3.rollup(filteredRows, v => v.length, d => d.attack_type);
+        const toolCount = d3.rollup(filteredRows, v => v.length, d => d.security_tools_used);
+        const pairCount = d3.rollup(filteredRows, v => v.length, d => d.attack_type, d => d.security_tools_used);
+
+        const matrix = Array.from({ length: attacks.length }, () => Array(tools.length).fill(0));
+        const meta = Array.from({ length: attacks.length }, () => Array(tools.length).fill(null));
+
+        attacks.forEach((a, i) => {
+          tools.forEach((t, j) => {
+            const obs = (pairCount.get(a) && pairCount.get(a).get(t)) || 0;
+            const pa = (attackCount.get(a) || 0) / n;
+            const pt = (toolCount.get(t) || 0) / n;
+            const expected = pa * pt * n;
+            const lift = expected > 0 ? obs / expected : 0;
+            const centered = expected > 0 ? (obs - expected) / expected : 0;
+            matrix[i][j] = centered;
+            meta[i][j] = { attack: a, tool: t, obs, expected, lift, pmi: lift > 0 ? Math.log2(lift) : -Infinity };
+          });
+        });
+
+        return { attacks, tools, matrix, meta };
+      }
+
+      function renderNetwork(currentRows) {
+        svg.selectAll('*').remove();
+
+        const { attacks, tools, matrix, meta } = computeAssociation(currentRows);
+
+        // Even vertical spacing for both sides
+        const attackScale = d3.scalePoint().domain(d3.range(attacks.length)).range([0, innerHeight]).padding(0.5);
+        const toolScale = d3.scalePoint().domain(d3.range(tools.length)).range([0, innerHeight]).padding(0.5);
+
+        const leftX = innerWidth * 0.15;
+        const rightX = innerWidth * 0.85;
+
+        const attackNodes = attacks.map((name, i) => ({ id: `attack-${i}`, name, type: 'attack', x: leftX, y: attackScale(i) }));
+        const toolNodes = tools.map((name, i) => ({ id: `tool-${i}`, name, type: 'tool', x: rightX, y: toolScale(i) }));
+
+        // All links (no threshold) so everything links to everything
+        const links = [];
+        for (let i = 0; i < attacks.length; i++) {
+          for (let j = 0; j < tools.length; j++) {
+            links.push({
+              source: attackNodes[i],
+              target: toolNodes[j],
+              centered: matrix[i][j],
+              meta: meta[i][j]
+                });
+            }
+        }
+
+        // Curved path generator between two points
+        const linkPath = (a, b) => {
+          const cx1 = a.x + (b.x - a.x) * 0.45;
+          const cx2 = a.x + (b.x - a.x) * 0.55;
+          return `M${a.x},${a.y} C${cx1},${a.y} ${cx2},${b.y} ${b.x},${b.y}`;
+        };
+
+        // Draw links
+        const link = svg.append('g')
+          .attr('fill', 'none')
+          .selectAll('path')
+          .data(links)
+          .enter().append('path')
+          .attr('class', 'network-link')
+          .attr('d', d => linkPath(d.source, d.target))
+          .attr('stroke', d => assocColor(d.centered))
+          .attr('stroke-width', d => 0.8 + 5.2 * Math.min(1, Math.abs(d.centered)))
+          .attr('stroke-opacity', d => 0.18 + 0.62 * Math.min(1, Math.abs(d.centered)))
+          .on('mouseover', function (event, d) {
+            d3.select(this).classed('hover', true);
+            tooltip.classed('show', true)
+              .html(`
+                <div><strong>${d.meta.attack}</strong> → <strong>${d.meta.tool}</strong></div>
+                <div>Observed: ${d.meta.obs.toLocaleString()}</div>
+                <div>Expected: ${d.meta.expected.toFixed(1)}</div>
+                <div>Lift: ${d.meta.lift.toFixed(2)} | PMI: ${isFinite(d.meta.pmi) ? d.meta.pmi.toFixed(2) : '-∞'}</div>
+              `)
+              .style('left', (event.pageX + 12) + 'px')
+              .style('top', (event.pageY - 28) + 'px');
+          })
+          .on('mouseout', function () {
+            d3.select(this).classed('hover', false);
+            tooltip.classed('show', false);
+          });
+
+        // Draw nodes
+        const nodes = [...attackNodes, ...toolNodes];
+        const node = svg.append('g')
+          .selectAll('circle')
+          .data(nodes)
+          .enter().append('circle')
+          .attr('class', d => `network-node ${d.type}`)
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y)
+          .attr('r', 18)
+          .on('mouseover', function (_, d) {
+            link.classed('hover', l => l.source.id === d.id || l.target.id === d.id);
+          })
+          .on('mouseout', function () { link.classed('hover', false); });
+
+        // Labels
+        svg.append('g')
+          .selectAll('text')
+          .data(nodes)
+          .enter().append('text')
+          .attr('class', 'network-node-label')
+          .text(d => d.name)
+          .attr('x', d => d.x + (d.type === 'attack' ? -26 : 26))
+          .attr('y', d => d.y + 4)
+          .attr('text-anchor', d => d.type === 'attack' ? 'end' : 'start');
+
+        // Simple fade-in
+        link.style('opacity', 0).transition().duration(500).style('opacity', 1);
+        node.style('opacity', 0).transition().duration(600).delay(150).style('opacity', 1);
+      }
+
+      function getFilteredRows() {
+        const sel = industrySelect.property('value');
+        if (!sel || sel === 'all') return rows;
+        return rows.filter(r => r.industry === sel);
+      }
+
+      // Initial render
+      renderNetwork(getFilteredRows());
+
+      // Events
+      industrySelect.on('change', () => renderNetwork(getFilteredRows()));
+      resetBtn.on('click', () => { industrySelect.property('value', 'all'); renderNetwork(rows); });
+    });
+})();
