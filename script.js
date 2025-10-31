@@ -638,6 +638,18 @@
         });
     }
 
+  // Ability to check off items in checklist for Section 10
+  function initChecklist() {
+    const checklistItems = document.querySelectorAll('.checklist li');
+    
+    checklistItems.forEach(item => {
+      item.style.cursor = 'pointer';
+      
+      item.addEventListener('click', function() {
+        this.classList.toggle('checked');
+      });
+    });
+  }
 
   function init() {
     buildDotRail();
@@ -646,7 +658,8 @@
     setupMagnetic();
     initGlitch();
     initAttackVisualization();
-    initIndustryVisualization()
+    initIndustryVisualization();
+    initChecklist();
     if (!hasGSAP || reduceMotion) {
       revealFallback();
       return;

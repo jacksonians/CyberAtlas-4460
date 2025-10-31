@@ -295,6 +295,23 @@ main {
   transform: translateY(24px);
   opacity: 0;
   filter: blur(8px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.checklist li:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(102, 224, 255, 0.2);
+}
+
+.checklist li.checked {
+  background: rgba(107, 255, 168, 0.08);
+  border-color: rgba(107, 255, 168, 0.3);
+}
+
+.checklist li.checked span:last-child {
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 
 .check {
@@ -303,6 +320,24 @@ main {
   border-radius: 4px;
   border: 1px solid var(--line);
   background: rgba(7, 11, 23, 0.6);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.checklist li.checked .check {
+  background: var(--good);
+  border-color: var(--good);
+}
+
+.checklist li.checked .check::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--bg-0);
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .team {
