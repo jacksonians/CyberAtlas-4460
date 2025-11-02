@@ -24,8 +24,10 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"
       defer
     ></script>
-    <script src="script.js" defer></script>
+      <script src="MapVisual.js"></script>
+      <script src="script.js" defer></script>
     <script src="globevis.js" defer></script>
+
   </head>
   <body>
     <div class="background">
@@ -371,17 +373,30 @@
         </div>
       </section>
 
-      <section id="section8" class="scene">
-        <div class="container">
-          <article class="card card--placeholder">
-            <header>
-              <h2>Victims of Attacks</h2>
-              <p class="muted">Explore the impact on various sectors</p>
-            </header>
-            <div class="placeholder">Victims visualization coming soon</div>
-          </article>
-        </div>
-      </section>
+        <section id="section8" class="scene">
+            <div class="container">
+                <article class="card card--placeholder">
+                    <header>
+                        <h2>Victims of Attacks</h2>
+                        <p class="muted">Explore the impact on various sectors</p>
+                    </header>
+                    <div class="visualization-wrapper" style="display: flex; gap: 20px;">
+                        <!-- Map container -->
+                        <div id="map-container" style="flex: 2; min-width: 600px; height: 500px; border: 1px solid #ccc;"></div>
+                        <div id="tooltip" style="position: absolute; background: #1e1e2f; color: #e6edf7; padding: 6px 10px; border-radius: 5px; font-size: 12px; pointer-events: none; display: none; z-index: 1000;"></div>
+
+                        <!-- Pie chart container -->
+                        <div id="pie-container" style="flex: 1; min-width: 300px; height: 500px; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center;">
+                            <!-- Title for pie chart -->
+                            <div class="pie-title" style="text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 10px;">
+                                Add Pie chart here
+                            </div>
+                            <!-- Actual SVG or canvas will go here -->
+                            <div id="pie-chart" style="flex: 1; width: 100%;"></div>
+                        </div>                    </div>
+                </article>
+            </div>
+        </section>
 
       <section id="section9" class="scene">
         <div class="container split">

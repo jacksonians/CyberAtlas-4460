@@ -890,3 +890,25 @@ function handleSubmit(event) {
       resetBtn.on('click', () => { industrySelect.property('value', 'all'); renderNetwork(rows); });
     });
 })();
+
+document.addEventListener("DOMContentLoaded", async function() {
+    try {
+        // Load and parse CSV safely
+        const csvData = await d3.csv("data/US_Cyber_Crimes.csv", d => ({
+            state: d.State || "Unknown",
+            year: d.Year ? +d.Year : 0,
+            population: d.Population ? +d.Population.replace(/,/g, '').trim() : 0,
+            totalCrimeCount: d.Totalcrime_count ? +d.Totalcrime_count.replace(/,/g, '').trim() : 0,
+            totalCrimeLoss: d.Totalcrime_loss ? +d.Totalcrime_loss.replace(/[$,]/g, '').trim() : 0
+        }));
+
+        // Initialize map
+        new CrimeMapVisual(
+            "map-container",
+            csvData,
+            "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"
+        );
+    } catch (err) {
+        console.error("Error loading data:", err);
+    }
+});
