@@ -494,7 +494,7 @@
     }
   }
     function initIndustryVisualization() {
-        const industryContainer = document.querySelector('#section6 .placeholder');
+        const industryContainer = document.querySelector('#section7 .placeholder');
         if (!industryContainer) return;
 
         // Remove placeholder

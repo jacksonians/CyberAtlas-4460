@@ -273,6 +273,128 @@ main {
   filter: blur(8px);
 }
 
+/* Info Cards */
+.info-card .info-content {
+  position: relative;
+  z-index: 1;
+}
+
+.info-card p {
+  max-width: 100%;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.info-list li {
+  padding: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.7;
+}
+
+.info-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.highlight-box {
+  background: rgba(102, 224, 255, 0.08);
+  border: 1px solid rgba(102, 224, 255, 0.25);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.highlight-box.danger {
+  background: rgba(235, 87, 87, 0.08);
+  border-color: rgba(235, 87, 87, 0.25);
+}
+
+.highlight-box h3 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.highlight-box.danger h3 {
+  color: #ff6b9d;
+}
+
+.highlight-box ul {
+  margin: 0.5rem 0 0 1.5rem;
+}
+
+.highlight-box ul li {
+  margin: 0.5rem 0;
+  line-height: 1.7;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(102, 224, 255, 0.2);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.stat-box h4 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+  margin: 0.5rem 0;
+  font-family: 'Archivo', sans-serif;
+}
+
+.industry-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+}
+
+.industry-section h4 {
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.industry-section p {
+  margin: 0.75rem 0;
+}
+
+.industry-section ul {
+  margin: 1rem 0 0 1.5rem;
+}
+
+.industry-section ul li {
+  margin: 0.5rem 0;
+  line-height: 1.7;
+}
+
 .checklist {
   list-style: none;
   padding: 0;
@@ -1254,6 +1376,22 @@ body::after {
 
   .team {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .industry-section {
+    padding: 1rem;
+  }
+
+  .highlight-box {
+    padding: 1rem;
   }
 }
 
