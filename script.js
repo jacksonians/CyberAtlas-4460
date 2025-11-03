@@ -638,6 +638,342 @@
         });
     }
 
+  // Linked Attack Type Visualizations (Area Chart + Bar Chart)
+  function initLinkedAttackCharts() {
+    const section = document.querySelector('#section9');
+    if (!section) return;
+
+    const areaCard = section.querySelector('.card:first-child .placeholder');
+    const barCard = section.querySelector('.card:last-child .placeholder');
+    if (!areaCard || !barCard) return;
+
+    // Also get the parent cards to adjust overflow
+    const areaCardParent = section.querySelector('.card:first-child');
+    const barCardParent = section.querySelector('.card:last-child');
+    
+    // Clear placeholders and adjust styling
+    areaCard.innerHTML = '';
+    barCard.innerHTML = '';
+    areaCard.style.display = 'flex';
+    areaCard.style.justifyContent = 'center';
+    areaCard.style.alignItems = 'flex-start';
+    areaCard.style.overflow = 'visible';
+    areaCard.style.paddingTop = '10px';
+    barCard.style.display = 'flex';
+    barCard.style.justifyContent = 'center';
+    barCard.style.alignItems = 'flex-start';
+    barCard.style.overflow = 'visible';
+    barCard.style.paddingTop = '60px';
+    
+    // Ensure parent cards don't clip content
+    if (areaCardParent) areaCardParent.style.overflow = 'visible';
+    if (barCardParent) barCardParent.style.overflow = 'visible';
+
+    // Dimensions - fit within split container
+    const areaWidth = 480;
+    const areaHeight = 400;
+    const barWidth = 480;
+    const barHeight = 400;
+    const margin = { top: 30, right: 60, bottom: 90, left: 65 };
+
+    // Create SVGs
+    const areaSvg = d3.select(areaCard)
+      .append('svg')
+      .attr('width', areaWidth)
+      .attr('height', areaHeight);
+
+    const barSvg = d3.select(barCard)
+      .append('svg')
+      .attr('width', barWidth)
+      .attr('height', barHeight);
+
+    // Tooltip
+    const tooltip = d3.select('body')
+      .append('div')
+      .attr('class', 'linked-chart-tooltip')
+      .style('position', 'fixed')
+      .style('background', '#1e1e2f')
+      .style('color', '#e6edf7')
+      .style('padding', '10px 14px')
+      .style('border-radius', '6px')
+      .style('font-size', '13px')
+      .style('pointer-events', 'none')
+      .style('z-index', '1000')
+      .style('opacity', 0)
+      .style('border', '1px solid rgba(168, 137, 255, 0.3)');
+
+    // Load data
+    d3.csv('data/DefenseTypes_IndustryTargeted_TypeOfAttack.csv').then(rawData => {
+      // Count attacks by type
+      const attackCounts = d3.rollups(
+        rawData,
+        v => v.length,
+        d => d.attack_type
+      ).map(([type, count]) => ({ type, count }))
+        .sort((a, b) => d3.descending(a.count, b.count));
+
+      // Get top attack types for better visualization
+      const topAttackTypes = attackCounts.slice(0, 7).map(d => d.type);
+
+      // Generate temporal data (simulate monthly data over 2 years)
+      const months = [];
+      const startDate = new Date(2022, 0, 1);
+      for (let i = 0; i < 24; i++) {
+        const date = new Date(2022, i, 1);
+        months.push(date);
+      }
+
+      // Simulate temporal distribution with realistic trends
+      const temporalData = months.map((month, i) => {
+        const dataPoint = { date: month };
+        const progress = i / 23; // 0 to 1 over time
+        
+        topAttackTypes.forEach(type => {
+          const baseCount = attackCounts.find(d => d.type === type).count;
+          const monthlyBase = baseCount / 24;
+          
+          // Add trends and seasonality
+          let trend = 1;
+          if (type === 'Ransomware') trend = 1 + progress * 0.8; // Growing
+          if (type === 'Phishing') trend = 1 + progress * 0.6; // Growing
+          if (type === 'Zero-Day Exploit') trend = 1 + progress * 0.5;
+          if (type === 'DDoS') trend = 1 + Math.sin(progress * Math.PI * 2) * 0.3; // Cyclical
+          if (type === 'Malware') trend = 1.2 - progress * 0.2; // Declining slightly
+          
+          // Add some randomness
+          const randomFactor = 0.8 + Math.random() * 0.4;
+          dataPoint[type] = Math.round(monthlyBase * trend * randomFactor);
+        });
+        
+        return dataPoint;
+      });
+
+      // Color scale
+      const colorScale = d3.scaleOrdinal()
+        .domain(topAttackTypes)
+        .range(['#a889ff', '#6fcf97', '#f2c94c', '#eb5757', '#56ccf2', '#ff6b9d', '#ffa94d']);
+
+      // State for linked highlighting
+      let selectedType = null;
+
+      // ==================== AREA CHART ====================
+      const areaG = areaSvg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+      const xArea = d3.scaleTime()
+        .domain(d3.extent(temporalData, d => d.date))
+        .range([0, areaWidth - margin.left - margin.right]);
+
+      const yArea = d3.scaleLinear()
+        .domain([0, d3.max(temporalData, d => d3.sum(topAttackTypes, type => d[type]))])
+        .nice()
+        .range([areaHeight - margin.top - margin.bottom, 0]);
+
+      // Stack data
+      const stack = d3.stack()
+        .keys(topAttackTypes)
+        .order(d3.stackOrderNone)
+        .offset(d3.stackOffsetNone);
+
+      const series = stack(temporalData);
+
+      // Area generator
+      const area = d3.area()
+        .x(d => xArea(d.data.date))
+        .y0(d => yArea(d[0]))
+        .y1(d => yArea(d[1]))
+        .curve(d3.curveMonotoneX);
+
+      // Draw areas
+      const areaLayers = areaG.selectAll('.area-layer')
+        .data(series)
+        .enter()
+        .append('path')
+        .attr('class', 'area-layer')
+        .attr('d', area)
+        .attr('fill', d => colorScale(d.key))
+        .attr('opacity', 0.7)
+        .style('cursor', 'pointer')
+        .on('mouseover', function(event, d) {
+          if (selectedType && selectedType !== d.key) return;
+          
+          d3.select(this).attr('opacity', 1);
+          const mouseDate = xArea.invert(d3.pointer(event, this)[0]);
+          const bisect = d3.bisector(d => d.data.date).left;
+          const index = bisect(d, mouseDate);
+          const dataPoint = d[index];
+          
+          if (dataPoint) {
+            const value = dataPoint[1] - dataPoint[0];
+            tooltip.transition().duration(150).style('opacity', 1);
+            tooltip.html(`<strong>${d.key}</strong><br/>Count: ${value.toLocaleString()}`)
+              .style('left', event.clientX + 12 + 'px')
+              .style('top', event.clientY - 40 + 'px');
+          }
+          
+          // Highlight corresponding bar
+          barBars.attr('opacity', bar => bar.type === d.key ? 1 : 0.3);
+        })
+        .on('mousemove', event => {
+          tooltip.style('left', event.clientX + 12 + 'px')
+            .style('top', event.clientY - 40 + 'px');
+        })
+        .on('mouseout', function(event, d) {
+          if (selectedType) return;
+          d3.select(this).attr('opacity', 0.7);
+          tooltip.transition().duration(200).style('opacity', 0);
+          barBars.attr('opacity', 1);
+        })
+        .on('click', function(event, d) {
+          if (selectedType === d.key) {
+            // Deselect
+            selectedType = null;
+            areaLayers.attr('opacity', 0.7).attr('stroke', 'none').attr('stroke-width', 0);
+            barBars.attr('opacity', 1).attr('stroke', 'none').attr('stroke-width', 0);
+          } else {
+            // Select
+            selectedType = d.key;
+            areaLayers.attr('opacity', layer => layer.key === d.key ? 1 : 0.2)
+              .attr('stroke', layer => layer.key === d.key ? '#fff' : 'none')
+              .attr('stroke-width', layer => layer.key === d.key ? 2 : 0);
+            barBars.attr('opacity', bar => bar.type === d.key ? 1 : 0.2)
+              .attr('stroke', bar => bar.type === d.key ? '#fff' : 'none')
+              .attr('stroke-width', bar => bar.type === d.key ? 2 : 0);
+          }
+        });
+
+      // Axes
+      areaG.append('g')
+        .attr('transform', `translate(0,${areaHeight - margin.top - margin.bottom})`)
+        .call(d3.axisBottom(xArea).ticks(6).tickFormat(d3.timeFormat('%b %Y')))
+        .selectAll('text')
+        .attr('fill', '#e6edf7')
+        .attr('transform', 'rotate(-30)')
+        .style('text-anchor', 'end');
+
+      areaG.append('g')
+        .call(d3.axisLeft(yArea).ticks(6))
+        .selectAll('text')
+        .attr('fill', '#e6edf7');
+
+      // Labels
+      areaSvg.append('text')
+        .attr('x', areaWidth / 2)
+        .attr('y', areaHeight - 5)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#e6edf7')
+        .attr('font-size', '12px')
+        .text('Time Period');
+
+      areaSvg.append('text')
+        .attr('x', -areaHeight / 2)
+        .attr('y', 12)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#e6edf7')
+        .attr('font-size', '12px')
+        .text('Attack Count');
+
+      // ==================== BAR CHART ====================
+      const barG = barSvg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+      const xBar = d3.scaleBand()
+        .domain(attackCounts.slice(0, 7).map(d => d.type))
+        .range([0, barWidth - margin.left - margin.right])
+        .padding(0.2);
+
+      const yBar = d3.scaleLinear()
+        .domain([0, d3.max(attackCounts.slice(0, 7), d => d.count)])
+        .nice()
+        .range([barHeight - margin.top - margin.bottom, 0]);
+
+      const barBars = barG.selectAll('.bar')
+        .data(attackCounts.slice(0, 7))
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('x', d => xBar(d.type))
+        .attr('y', d => yBar(d.count))
+        .attr('width', xBar.bandwidth())
+        .attr('height', d => barHeight - margin.top - margin.bottom - yBar(d.count))
+        .attr('fill', d => colorScale(d.type))
+        .attr('opacity', 1)
+        .style('cursor', 'pointer')
+        .on('mouseover', function(event, d) {
+          if (selectedType && selectedType !== d.type) return;
+          
+          d3.select(this).attr('opacity', 0.8);
+          tooltip.transition().duration(150).style('opacity', 1);
+          tooltip.html(`<strong>${d.type}</strong><br/>Total Attacks: ${d.count.toLocaleString()}`)
+            .style('left', event.clientX + 12 + 'px')
+            .style('top', event.clientY - 40 + 'px');
+          
+          // Highlight corresponding area
+          areaLayers.attr('opacity', layer => layer.key === d.type ? 1 : 0.3);
+        })
+        .on('mousemove', event => {
+          tooltip.style('left', event.clientX + 12 + 'px')
+            .style('top', event.clientY - 40 + 'px');
+        })
+        .on('mouseout', function() {
+          if (selectedType) return;
+          d3.select(this).attr('opacity', 1);
+          tooltip.transition().duration(200).style('opacity', 0);
+          areaLayers.attr('opacity', 0.7);
+        })
+        .on('click', function(event, d) {
+          if (selectedType === d.type) {
+            // Deselect
+            selectedType = null;
+            areaLayers.attr('opacity', 0.7).attr('stroke', 'none').attr('stroke-width', 0);
+            barBars.attr('opacity', 1).attr('stroke', 'none').attr('stroke-width', 0);
+          } else {
+            // Select
+            selectedType = d.type;
+            areaLayers.attr('opacity', layer => layer.key === d.type ? 1 : 0.2)
+              .attr('stroke', layer => layer.key === d.type ? '#fff' : 'none')
+              .attr('stroke-width', layer => layer.key === d.type ? 2 : 0);
+            barBars.attr('opacity', bar => bar.type === d.type ? 1 : 0.2)
+              .attr('stroke', bar => bar.type === d.type ? '#fff' : 'none')
+              .attr('stroke-width', bar => bar.type === d.type ? 2 : 0);
+          }
+        });
+
+      // Axes
+      barG.append('g')
+        .attr('transform', `translate(0,${barHeight - margin.top - margin.bottom})`)
+        .call(d3.axisBottom(xBar))
+        .selectAll('text')
+        .attr('fill', '#e6edf7')
+        .attr('transform', 'rotate(-30)')
+        .style('text-anchor', 'end');
+
+      barG.append('g')
+        .call(d3.axisLeft(yBar).ticks(6).tickFormat(d => d3.format('.2s')(d)))
+        .selectAll('text')
+        .attr('fill', '#e6edf7');
+
+      // Labels
+      barSvg.append('text')
+        .attr('x', barWidth / 2)
+        .attr('y', barHeight - 5)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#e6edf7')
+        .attr('font-size', '12px')
+        .text('ATTACK TYPE');
+
+      barSvg.append('text')
+        .attr('x', -barHeight / 2)
+        .attr('y', 12)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#e6edf7')
+        .attr('font-size', '12px')
+        .text('Total Count');
+    });
+  }
+
   // Ability to check off items in checklist for Section 10
   function initChecklist() {
     const checklistItems = document.querySelectorAll('.checklist li');
@@ -659,6 +995,7 @@
     initGlitch();
     initAttackVisualization();
     initIndustryVisualization();
+    initLinkedAttackCharts();
     initChecklist();
     if (!hasGSAP || reduceMotion) {
       revealFallback();
@@ -867,7 +1204,7 @@ function handleSubmit(event) {
           .enter().append('text')
           .attr('class', 'network-node-label')
           .text(d => d.name)
-          .attr('x', d => d.x + (d.type === 'attack' ? -26 : 26))
+          .attr('x', d => d.x + (d.type === 'attack' ? -85 : 85))
           .attr('y', d => d.y + 4)
           .attr('text-anchor', d => d.type === 'attack' ? 'end' : 'start');
 
