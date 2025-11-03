@@ -161,7 +161,7 @@ class CrimeMapVisual {
         d3.select("#loss-title").text(`${stateName}: Crime Loss Breakdown`);
         d3.select("#loss-title").node().nextElementSibling.textContent = `Total Loss: $${(stateData.totalCrimeLoss / 1000000).toFixed(2)}M`;
 
-        this.drawPieChart("#loss-pie-chart", data);
+        this.drawPieChart("#loss-pie-chart", data, 280);
     }
 
     updateAgePieChart(stateName, stateData) {
@@ -180,15 +180,15 @@ class CrimeMapVisual {
         d3.select("#age-title").text(`${stateName}: Victim Age Distribution`);
         d3.select("#age-title").node().nextElementSibling.textContent = `Total Victims: ${totalVictims.toLocaleString()}`;
 
-        this.drawPieChart("#age-pie-chart", data);
+        this.drawPieChart("#age-pie-chart", data, 320);
     }
 
-    drawPieChart(containerId, data) {
+    drawPieChart(containerId, data, size = 320) {
         const container = d3.select(containerId);
         container.selectAll("*").remove();
 
-        const width = 320;
-        const height = 320;
+        const width = size;
+        const height = size;
         const radius = Math.min(width, height) / 2 - 20;
 
         const svg = container.append("svg")
