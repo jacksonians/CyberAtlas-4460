@@ -278,6 +278,17 @@
               <h3>Top Targeted Industries and Why</h3>
               
               <div class="industry-section">
+                <h4>🏭 Manufacturing</h4>
+                <p><strong>Why targeted:</strong> Manufacturing companies control critical supply chains and industrial processes. Disrupting production lines can halt entire industries, making these targets valuable for ransomware attacks and economic warfare.</p>
+                <ul>
+                  <li>Industrial control systems vulnerable to remote access</li>
+                  <li>Supply chain disruptions create widespread economic impact</li>
+                  <li>Intellectual property and proprietary designs highly valuable</li>
+                  <li>Production downtime forces quick ransom payments</li>
+                </ul>
+              </div>
+
+              <div class="industry-section">
                 <h4>🏥 Healthcare</h4>
                 <p><strong>Why targeted:</strong> Healthcare organizations store vast amounts of sensitive personal data, including social security numbers, medical histories, and payment information. Patient data sells for up to $1,000 per record on the dark web—50x more than credit card information.</p>
                 <ul>
@@ -289,7 +300,18 @@
               </div>
 
               <div class="industry-section">
-                <h4>🏦 Financial Services</h4>
+                <h4>💻 Technology</h4>
+                <p><strong>Why targeted:</strong> Technology companies hold massive amounts of user data, proprietary software code, and cloud infrastructure access. Breaches can expose millions of users and provide access to downstream customer systems.</p>
+                <ul>
+                  <li>Cloud platform access enables broader attack campaigns</li>
+                  <li>Source code theft compromises intellectual property</li>
+                  <li>User databases contain credentials for credential stuffing</li>
+                  <li>Software supply chain attacks can infect thousands of organizations</li>
+                </ul>
+              </div>
+
+              <div class="industry-section">
+                <h4>🏦 Finance</h4>
                 <p><strong>Why targeted:</strong> Direct access to money and financial credentials. Banks, investment firms, and insurance companies manage trillions in assets and transactions.</p>
                 <ul>
                   <li>Immediate financial gain through theft or fraud</li>
@@ -300,18 +322,7 @@
               </div>
 
               <div class="industry-section">
-                <h4>🏛️ Government & Defense</h4>
-                <p><strong>Why targeted:</strong> State-sponsored actors seek classified information, intellectual property, and strategic intelligence. Successful breaches can influence geopolitics and national security.</p>
-                <ul>
-                  <li>Military secrets and defense technology</li>
-                  <li>Citizen databases for espionage</li>
-                  <li>Election systems and democratic processes</li>
-                  <li>Critical infrastructure control systems</li>
-                </ul>
-              </div>
-
-              <div class="industry-section">
-                <h4>🛒 Retail & E-Commerce</h4>
+                <h4>🛒 Retail</h4>
                 <p><strong>Why targeted:</strong> Massive volumes of customer payment data and personal information. A single breach can expose millions of credit cards.</p>
                 <ul>
                   <li>Payment card information sold in bulk</li>
@@ -322,24 +333,13 @@
               </div>
 
               <div class="industry-section">
-                <h4>⚡ Energy & Utilities</h4>
-                <p><strong>Why targeted:</strong> Control over critical infrastructure provides leverage for ransomware and potential for catastrophic disruption. The Colonial Pipeline attack demonstrated how a single breach can create nationwide fuel shortages.</p>
+                <h4>🏛️ Government</h4>
+                <p><strong>Why targeted:</strong> State-sponsored actors seek classified information, intellectual property, and strategic intelligence. Successful breaches can influence geopolitics and national security.</p>
                 <ul>
-                  <li>Essential services must pay ransoms quickly</li>
-                  <li>Industrial control system vulnerabilities</li>
-                  <li>Geopolitical leverage and sabotage potential</li>
-                  <li>Cascading failures affect millions</li>
-                </ul>
-              </div>
-
-              <div class="industry-section">
-                <h4>🎓 Education</h4>
-                <p><strong>Why targeted:</strong> Universities and schools have valuable research data, limited security budgets, and large attack surfaces with thousands of users.</p>
-                <ul>
-                  <li>Research intellectual property and patents</li>
-                  <li>Student and staff personal information</li>
-                  <li>Minimal cybersecurity funding and staffing</li>
-                  <li>Open network policies for academic freedom</li>
+                  <li>Military secrets and defense technology</li>
+                  <li>Citizen databases for espionage</li>
+                  <li>Election systems and democratic processes</li>
+                  <li>Critical infrastructure control systems</li>
                 </ul>
               </div>
 
@@ -433,15 +433,6 @@
             <div class="network-wrapper">
               <div class="network-description">
                 <p>Association network showing attack types (left) and security tools (right). Link thickness and color represent association strength relative to chance. All pairs are shown.</p>
-              </div>
-              <div class="network-controls">
-                <div class="control-group">
-                  <label for="network-industry">Filter by industry</label>
-                  <select id="network-industry">
-                    <option value="all">All industries</option>
-                  </select>
-                </div>
-                <button id="network-reset" class="reset-btn">Reset</button>
               </div>
               <div id="attack-tool-network" class="network-container">
                 <div class="network-labels">

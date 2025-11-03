@@ -527,7 +527,7 @@
             .style('opacity', 0);
 
         // Load your CSV file
-        d3.csv('data/DefenseTypes_IndustryTargeted_TypeOfAttack.csv').then(rawData => {
+        d3.csv('data/Cybersecurity_Incidents_Database.csv').then(rawData => {
             // Count how many attacks per industry
             const industryCounts = d3.rollups(
                 rawData,
@@ -703,7 +703,7 @@
       .style('border', '1px solid rgba(168, 137, 255, 0.3)');
 
     // Load data
-    d3.csv('data/DefenseTypes_IndustryTargeted_TypeOfAttack.csv').then(rawData => {
+    d3.csv('data/Cybersecurity_Incidents_Database.csv').then(rawData => {
       // Count attacks by type
       const attackCounts = d3.rollups(
         rawData,
@@ -1058,7 +1058,7 @@ function handleSubmit(event) {
 
   const width = 820;
   const height = 520;
-  const margin = { top: 60, right: 40, bottom: 40, left: 40 };
+  const margin = { top: 60, right: 40, bottom: 40, left: 80 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -1073,9 +1073,6 @@ function handleSubmit(event) {
     .append('div')
     .attr('class', 'network-tooltip');
 
-  const industrySelect = d3.select('#network-industry');
-  const resetBtn = d3.select('#network-reset');
-
   // Diverging color scale: under-expected -> neutral -> over-expected
   const colorUnder = d3.rgb(102, 224, 255, 0.25); // cyan, faint
   const colorOver = d3.rgb(168, 137, 255, 0.85); // purple, strong
@@ -1083,13 +1080,11 @@ function handleSubmit(event) {
     d3.interpolateRgb(colorUnder, colorOver)(d3.scaleLinear().domain([-0.5, 0.8]).range([0, 1])(t))
   );
 
-  fetch('data/DefenseTypes_IndustryTargeted_TypeOfAttack.csv')
+  fetch('data/Cybersecurity_Incidents_Database.csv')
     .then(r => r.text())
     .then(csvText => {
       const rows = d3.csvParse(csvText);
-
-      const allIndustries = Array.from(new Set(rows.map(d => d.industry))).sort();
-      allIndustries.forEach(ind => industrySelect.append('option').attr('value', ind).text(ind));
+      console.log('Bipartite network loaded:', rows.length, 'rows');
 
       function computeAssociation(filteredRows) {
         const attacks = Array.from(new Set(filteredRows.map(d => d.attack_type))).sort();
@@ -1193,9 +1188,31 @@ function handleSubmit(event) {
           .attr('cy', d => d.y)
           .attr('r', 18)
           .on('mouseover', function (_, d) {
-            link.classed('hover', l => l.source.id === d.id || l.target.id === d.id);
+            // Highlight connected links and blur others
+            link.each(function(l) {
+              const isConnected = l.source.id === d.id || l.target.id === d.id;
+              d3.select(this)
+                .classed('hover', isConnected)
+                .style('opacity', isConnected ? 1 : 0.08)
+                .style('filter', isConnected ? 'none' : 'blur(1px)');
+            });
+            // Highlight connected nodes and blur others
+            node.each(function(n) {
+              const isConnected = n.id === d.id || 
+                links.some(l => (l.source.id === d.id && l.target.id === n.id) || 
+                               (l.target.id === d.id && l.source.id === n.id));
+              d3.select(this)
+                .style('opacity', isConnected ? 1 : 0.2)
+                .style('filter', isConnected ? 'none' : 'blur(2px)');
+            });
           })
-          .on('mouseout', function () { link.classed('hover', false); });
+          .on('mouseout', function () { 
+            link.classed('hover', false)
+              .style('opacity', null)
+              .style('filter', null);
+            node.style('opacity', null)
+              .style('filter', null);
+          });
 
         // Labels
         svg.append('g')
@@ -1213,18 +1230,8 @@ function handleSubmit(event) {
         node.style('opacity', 0).transition().duration(600).delay(150).style('opacity', 1);
       }
 
-      function getFilteredRows() {
-        const sel = industrySelect.property('value');
-        if (!sel || sel === 'all') return rows;
-        return rows.filter(r => r.industry === sel);
-      }
-
-      // Initial render
-      renderNetwork(getFilteredRows());
-
-      // Events
-      industrySelect.on('change', () => renderNetwork(getFilteredRows()));
-      resetBtn.on('click', () => { industrySelect.property('value', 'all'); renderNetwork(rows); });
+      // Initial render with all data
+      renderNetwork(rows);
     });
 })();
 
