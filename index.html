@@ -374,26 +374,32 @@
       </section>
 
         <section id="section8" class="scene">
-            <div class="container">
-                <article class="card card--placeholder">
+            <div class="container wide">
+                <article class="card">
                     <header>
-                        <h2>Victims of Attacks</h2>
-                        <p class="muted">Explore the impact on various sectors</p>
+                        <h2>US Cyber Crime Analysis by State</h2>
+                        <p class="muted">Hover over states to see crime type breakdown and victim age distribution</p>
                     </header>
-                    <div class="visualization-wrapper" style="display: flex; gap: 20px;">
-                        <!-- Map container -->
-                        <div id="map-container" style="flex: 2; min-width: 600px; height: 500px; border: 1px solid #ccc;"></div>
-                        <div id="tooltip" style="position: absolute; background: #1e1e2f; color: #e6edf7; padding: 6px 10px; border-radius: 5px; font-size: 12px; pointer-events: none; display: none; z-index: 1000;"></div>
-
-                        <!-- Pie chart container -->
-                        <div id="pie-container" style="flex: 1; min-width: 300px; height: 500px; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center;">
-                            <!-- Title for pie chart -->
-                            <div class="pie-title" style="text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 10px;">
-                                Add Pie chart here
-                            </div>
-                            <!-- Actual SVG or canvas will go here -->
-                            <div id="pie-chart" style="flex: 1; width: 100%;"></div>
-                        </div>                    </div>
+                    
+                    <!-- Map container -->
+                    <div id="map-container"></div>
+                    
+                    <!-- Pie charts container -->
+                    <div class="pie-charts-container">
+                        <!-- Crime Type Breakdown Pie Chart -->
+                        <div class="pie-chart-section">
+                            <h3 class="pie-title" id="loss-title">Crime Type Breakdown by Loss</h3>
+                            <p class="pie-subtitle muted">Hover over a state to see data</p>
+                            <div id="loss-pie-chart"></div>
+                        </div>
+                        
+                        <!-- Age Distribution Pie Chart -->
+                        <div class="pie-chart-section">
+                            <h3 class="pie-title" id="age-title">Victim Age Distribution</h3>
+                            <p class="pie-subtitle muted">Hover over a state to see data</p>
+                            <div id="age-pie-chart"></div>
+                        </div>
+                    </div>
                 </article>
             </div>
         </section>

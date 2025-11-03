@@ -1446,6 +1446,80 @@ body::after {
     font-weight: 500;
 }
 
+/* ===== MAP VISUALIZATION WITH PIE CHARTS ===== */
+#map-container {
+  width: 100%;
+  min-height: 400px;
+  max-height: 450px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(102, 224, 255, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.pie-charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.pie-chart-section {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(102, 224, 255, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.pie-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.pie-subtitle {
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+#loss-pie-chart,
+#age-pie-chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 320px;
+  overflow: visible;
+}
+
+.pie-legend {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.pie-legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+@media (max-width: 900px) {
+  .pie-charts-container {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ===== ATTACK–TOOL BIPARTITE NETWORK ===== */
 .network-wrapper { padding: 1.5rem 0; }
 .network-description { text-align: center; color: var(--text-secondary); margin-bottom: 1.25rem; }

@@ -893,16 +893,13 @@ function handleSubmit(event) {
 
 document.addEventListener("DOMContentLoaded", async function() {
     try {
-        // Load and parse CSV safely
-        const csvData = await d3.csv("data/US_Cyber_Crimes.csv", d => ({
-            state: d.State || "Unknown",
-            year: d.Year ? +d.Year : 0,
-            population: d.Population ? +d.Population.replace(/,/g, '').trim() : 0,
-            totalCrimeCount: d.Totalcrime_count ? +d.Totalcrime_count.replace(/,/g, '').trim() : 0,
-            totalCrimeLoss: d.Totalcrime_loss ? +d.Totalcrime_loss.replace(/[$,]/g, '').trim() : 0
-        }));
+        // Load CSV data with all columns intact
+        const csvData = await d3.csv("data/US_Cyber_Crimes.csv");
 
-        // Initialize map
+        console.log("CSV Data loaded:", csvData.length, "states");
+        console.log("Sample data:", csvData[0]);
+
+        // Initialize map visualization
         new CrimeMapVisual(
             "map-container",
             csvData,
