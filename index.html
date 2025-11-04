@@ -89,14 +89,13 @@
             </div>
             <div class="scanlines" aria-hidden="true"></div>
             <h1 class="hero__title">
-              <span class="glitch" data-text="Invisible Wars">Invisible Wars</span>
+              <span class="glitch" data-text="The Hidden Threat">The Hidden Threat</span>
             </h1>
             <p class="hero__subtitle">
-              The Global Web of Cyber Conflicts. Explore the danger of cyberattacks and learn ways to protect yourself.
+              Cyberattacks can cost you money, privacy, and peace of mind. Learn how to stay protected.
             </p>
             <div class="hero__actions">
-              <button class="btn btn--primary" type="button">Explore Data</button>
-              <button class="btn btn--ghost" type="button">Learn More</button>
+              <button class="btn btn--primary" id="explore-data-btn" type="button">Explore Data</button>
             </div>
           </div>
         </div>
@@ -144,50 +143,42 @@
               <div class="chip">Every 39 seconds</div>
               <div class="chip">30% increase in Q2 2024</div>
             </div>
-            <p style="margin-top: 1.5rem;">According to a study by the University of Maryland, a cyber attack occurs every 39 seconds, translating into an average of 2,244 attacks per day. These attacks are becoming increasingly common. In Q2 of 2024, global cyberattacks have increased by 30%.</p>
+            <p style="margin-top: 1.5rem;">According to a study by the University of Maryland, a cyber attack occurs once every 39 seconds in the US, translating into an average of 2,244 attacks per day. These attacks are becoming increasingly common. In Q2 of 2024, global cyberattacks have increased by 30%.</p>
           </article>
         </div>
       </section>
 
       <section id="section4" class="scene">
-        <div class="container wide">
-          <article class="card">
+        <div class="container">
+          <article class="card info-card">
             <header>
-              <h2>Global Cybersecurity Metrics</h2>
-              <p class="muted">Drag to rotate. Hover for country metrics.</p>
+              <h2>How Prepared Are Countries Worldwide?</h2>
+              <p class="muted">Not all nations are equally protected</p>
             </header>
-            <div id="mapVis"></div>
+            <div class="info-content">
+              <p>While attacks are happening everywhere, some countries are better prepared than others. The visualization below shows cybersecurity readiness across nations, measured by four key metrics:</p>
+              
+              <ul class="info-list" style="margin: 1.5rem 0;">
+                <li><strong>CEI (Cybersecurity Exposure Index):</strong> Vulnerability to cyber threats based on infrastructure and digital exposure.</li>
+                <li><strong>GCI (Global Cybersecurity Index):</strong> ITU's assessment of commitment to cybersecurity across legal, technical, and organizational measures.</li>
+                <li><strong>NCSI (National Cyber Security Index):</strong> Preparedness to prevent cyber threats and manage incidents.</li>
+                <li><strong>DDL (Data Defense Level):</strong> Strength of data protection laws and enforcement.</li>
+              </ul>
+
+              <p style="margin-bottom: 1.5rem;"><strong>Color coding:</strong> Lighter/bright green = stronger cybersecurity. Darker colors = more vulnerable. Hover over countries to see their specific scores.</p>
+            </div>
           </article>
         </div>
       </section>
 
       <section id="section4a" class="scene">
-        <div class="container">
-          <article class="card info-card">
+        <div class="container wide">
+          <article class="card">
             <header>
-              <h2>Understanding Global Cyber Preparedness</h2>
-              <p class="muted">What the data reveals</p>
+              <h2>Global Cybersecurity Landscape</h2>
+              <p class="muted">Drag to rotate. Hover for country metrics.</p>
             </header>
-            <div class="info-content">
-              <p>The globe visualization displays cybersecurity readiness across nations using four key metrics:</p>
-              <ul class="info-list">
-                <li><strong>CEI (Cybersecurity Exposure Index):</strong> Measures a country's vulnerability to cyber threats based on infrastructure and digital exposure.</li>
-                <li><strong>GCI (Global Cybersecurity Index):</strong> ITU's assessment of commitment to cybersecurity across legal, technical, organizational, capacity building, and cooperation pillars.</li>
-                <li><strong>NCSI (National Cyber Security Index):</strong> Evaluates a country's preparedness to prevent cyber threats and manage cyber incidents.</li>
-                <li><strong>DDL (Data Defense Level):</strong> Measures the strength of data protection laws and enforcement mechanisms.</li>
-              </ul>
-              <div class="highlight-box">
-                <h3>Key Insights</h3>
-                <p>Countries with darker green shading demonstrate stronger cybersecurity infrastructure and preparedness. These nations typically invest heavily in:</p>
-                <ul>
-                  <li>Advanced threat detection systems</li>
-                  <li>Comprehensive cybersecurity legislation</li>
-                  <li>Public-private sector collaboration</li>
-                  <li>Cybersecurity education and workforce development</li>
-                </ul>
-                <p style="margin-top: 1rem;"><strong>Why this matters:</strong> Nations with weaker cybersecurity (lighter colors) are more vulnerable to attacks, data breaches, and digital infrastructure disruptions. This creates global security risks as attackers often use less-protected countries as launching points for international cyber operations.</p>
-              </div>
-            </div>
+            <div id="mapVis"></div>
           </article>
         </div>
       </section>
@@ -233,14 +224,6 @@
                 </ul>
               </div>
 
-              <h3 style="margin-top: 2rem;">Why Attacks Spread So Fast</h3>
-              <ul class="info-list">
-                <li><strong>Interconnected Systems:</strong> Modern infrastructure relies on networks where one compromised system can infect hundreds within minutes</li>
-                <li><strong>Automated Propagation:</strong> Advanced malware self-replicates without human intervention, spreading exponentially</li>
-                <li><strong>Supply Chain Vulnerabilities:</strong> Attackers target weak links in the supply chain to gain access to multiple organizations simultaneously</li>
-                <li><strong>Zero-Day Exploits:</strong> Attacks using unknown vulnerabilities spread rapidly before defenses can be deployed</li>
-              </ul>
-
               <div class="stats-grid" style="margin-top: 2rem;">
                 <div class="stat-box">
                   <h4>Average Time to Detect Breach</h4>
@@ -258,104 +241,6 @@
                   <p class="muted small">Up 82% year-over-year in 2023</p>
                 </div>
               </div>
-
-              <p style="margin-top: 2rem;"><strong>The Domino Effect:</strong> As you saw in the visualization, attacking a critical system like the power grid or internet backbone can cascade through hospitals, emergency services, transportation, and financial systems—paralyzing entire cities within hours.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section id="section6" class="scene">
-        <div class="container">
-          <article class="card info-card">
-            <header>
-              <h2>Most Targeted Industries</h2>
-              <p class="muted">Why hackers focus on specific sectors</p>
-            </header>
-            <div class="info-content">
-              <p>Cybercriminals strategically target industries based on potential financial gain, valuable data, and impact. Understanding these targets helps organizations prioritize their defenses.</p>
-
-              <h3>Top Targeted Industries and Why</h3>
-              
-              <div class="industry-section">
-                <h4>🏭 Manufacturing</h4>
-                <p><strong>Why targeted:</strong> Manufacturing companies control critical supply chains and industrial processes. Disrupting production lines can halt entire industries, making these targets valuable for ransomware attacks and economic warfare.</p>
-                <ul>
-                  <li>Industrial control systems vulnerable to remote access</li>
-                  <li>Supply chain disruptions create widespread economic impact</li>
-                  <li>Intellectual property and proprietary designs highly valuable</li>
-                  <li>Production downtime forces quick ransom payments</li>
-                </ul>
-              </div>
-
-              <div class="industry-section">
-                <h4>🏥 Healthcare</h4>
-                <p><strong>Why targeted:</strong> Healthcare organizations store vast amounts of sensitive personal data, including social security numbers, medical histories, and payment information. Patient data sells for up to $1,000 per record on the dark web—50x more than credit card information.</p>
-                <ul>
-                  <li>Life-or-death situations force quick ransom payments</li>
-                  <li>Legacy systems with outdated security</li>
-                  <li>Medical devices vulnerable to exploitation</li>
-                  <li>HIPAA violations carry massive penalties</li>
-                </ul>
-              </div>
-
-              <div class="industry-section">
-                <h4>💻 Technology</h4>
-                <p><strong>Why targeted:</strong> Technology companies hold massive amounts of user data, proprietary software code, and cloud infrastructure access. Breaches can expose millions of users and provide access to downstream customer systems.</p>
-                <ul>
-                  <li>Cloud platform access enables broader attack campaigns</li>
-                  <li>Source code theft compromises intellectual property</li>
-                  <li>User databases contain credentials for credential stuffing</li>
-                  <li>Software supply chain attacks can infect thousands of organizations</li>
-                </ul>
-              </div>
-
-              <div class="industry-section">
-                <h4>🏦 Finance</h4>
-                <p><strong>Why targeted:</strong> Direct access to money and financial credentials. Banks, investment firms, and insurance companies manage trillions in assets and transactions.</p>
-                <ul>
-                  <li>Immediate financial gain through theft or fraud</li>
-                  <li>High-value wire transfers and cryptocurrency exchanges</li>
-                  <li>Customer financial data enables identity theft</li>
-                  <li>Stock market manipulation opportunities</li>
-                </ul>
-              </div>
-
-              <div class="industry-section">
-                <h4>🛒 Retail</h4>
-                <p><strong>Why targeted:</strong> Massive volumes of customer payment data and personal information. A single breach can expose millions of credit cards.</p>
-                <ul>
-                  <li>Payment card information sold in bulk</li>
-                  <li>Customer credentials for account takeovers</li>
-                  <li>Supply chain access to multiple vendors</li>
-                  <li>Point-of-sale system vulnerabilities</li>
-                </ul>
-              </div>
-
-              <div class="industry-section">
-                <h4>🏛️ Government</h4>
-                <p><strong>Why targeted:</strong> State-sponsored actors seek classified information, intellectual property, and strategic intelligence. Successful breaches can influence geopolitics and national security.</p>
-                <ul>
-                  <li>Military secrets and defense technology</li>
-                  <li>Citizen databases for espionage</li>
-                  <li>Election systems and democratic processes</li>
-                  <li>Critical infrastructure control systems</li>
-                </ul>
-              </div>
-
-              <div class="highlight-box" style="margin-top: 2rem;">
-                <h3>The Value of Stolen Data</h3>
-                <p>Different data types command different prices on dark web marketplaces:</p>
-                <ul>
-                  <li><strong>Medical Records:</strong> $250-$1,000 per record</li>
-                  <li><strong>Credit Card Information:</strong> $5-$110 depending on card type and data completeness</li>
-                  <li><strong>Online Banking Credentials:</strong> $40-$200 per account</li>
-                  <li><strong>Social Security Numbers:</strong> $1-$15 per number</li>
-                  <li><strong>Corporate Credentials:</strong> $500-$10,000+ for executive access</li>
-                </ul>
-              </div>
-
-              <p style="margin-top: 2rem;"><strong>The next visualization will show you the actual distribution of attacks across these industries and how defense strategies vary by sector.</strong></p>
             </div>
           </article>
         </div>
@@ -366,7 +251,7 @@
           <article class="card card--placeholder">
             <header>
               <h2>Industry Attack Distribution</h2>
-              <p class="muted">Visualization of attack frequency by sector</p>
+              <p class="muted">Visualization of attack frequency by sector - Based on 100,000 cyberattacks</p>
             </header>
             <div class="placeholder">Industry visualization coming soon</div>
           </article>
@@ -399,6 +284,18 @@
                             <p class="pie-subtitle muted">Hover over a state to see data</p>
                             <div id="age-pie-chart"></div>
                         </div>
+                    </div>
+
+                    <div class="highlight-box" style="margin-top: 2rem;">
+                        <h3>The Value of Stolen Data</h3>
+                        <p>Different data types command different prices on dark web marketplaces:</p>
+                        <ul>
+                          <li><strong>Medical Records:</strong> $250-$1,000 per record</li>
+                          <li><strong>Credit Card Information:</strong> $5-$110 depending on card type and data completeness</li>
+                          <li><strong>Online Banking Credentials:</strong> $40-$200 per account</li>
+                          <li><strong>Social Security Numbers:</strong> $1-$15 per number</li>
+                          <li><strong>Corporate Credentials:</strong> $500-$10,000+ for executive access</li>
+                        </ul>
                     </div>
                 </article>
             </div>
@@ -438,15 +335,6 @@
                 <div class="network-labels">
                   <div class="side-label left">Attack Types</div>
                   <div class="side-label right">Security Tools</div>
-                </div>
-              </div>
-              <div class="network-legend">
-                <div class="legend-row">
-                  <span class="legend-title">Association strength</span>
-                  <div class="legend-bar network-gradient"></div>
-                  <span class="legend-min">Under-expected</span>
-                  <span class="legend-mid">Expected</span>
-                  <span class="legend-max">Over-expected</span>
                 </div>
               </div>
             </div>

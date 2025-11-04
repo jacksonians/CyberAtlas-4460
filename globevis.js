@@ -131,6 +131,26 @@ class MapVis {
     wrangleData() {
         let vis = this;
 
+        // Country name mapping from GeoJSON names to CSV names
+        vis.countryNameMap = {
+            'United States of America': 'United States',
+            'United States': 'United States',
+            'USA': 'United States',
+            'Russian Federation': 'Russia',
+            'Myanmar': 'Myanmar',
+            'Czechia': 'Czech Republic',
+            'Macedonia': 'North Macedonia',
+            'Swaziland': 'Eswatini',
+            'Cape Verde': 'Cabo Verde',
+            'Ivory Coast': 'Cote d\'ivoire',
+            'East Timor': 'Timor-Leste',
+            'Palestine': 'Palestine',
+            'Brunei': 'Brunei Darussalam',
+            'Laos': 'Lao PDR',
+            'Syria': 'Syria',
+            'Vatican': 'Vatican City'
+        };
+
         // Create country info structure with cybersecurity data
         vis.countryInfo = {};
         
@@ -167,20 +187,46 @@ class MapVis {
         vis.updateVis();
     }
 
+    // Helper function to find country info by GeoJSON name
+    findCountryInfo(geoJsonName) {
+        let vis = this;
+        
+        // Try exact match first
+        if (vis.countryInfo[geoJsonName]) {
+            return vis.countryInfo[geoJsonName];
+        }
+        
+        // Try mapped name
+        const mappedName = vis.countryNameMap[geoJsonName];
+        if (mappedName && vis.countryInfo[mappedName]) {
+            return vis.countryInfo[mappedName];
+        }
+        
+        // Try case-insensitive match
+        for (let csvName in vis.countryInfo) {
+            if (csvName.toLowerCase() === geoJsonName.toLowerCase()) {
+                return vis.countryInfo[csvName];
+            }
+        }
+        
+        return null;
+    }
+
     updateVis() {
         let vis = this;
 
         vis.countries
             .attr('fill', d => {
                 let countryName = d.properties.name;
-                if (vis.countryInfo[countryName]) {
-                    return vis.countryInfo[countryName].color;
+                let info = vis.findCountryInfo(countryName);
+                if (info) {
+                    return info.color;
                 }
                 return '#3a3a52';
             })
             .on('mouseover', function(event, d) {
                 let countryName = d.properties.name;
-                let info = vis.countryInfo[countryName];
+                let info = vis.findCountryInfo(countryName);
 
                 d3.select(this)
                     .attr('stroke-width', '2px')
@@ -205,7 +251,7 @@ class MapVis {
             })
             .on('mouseout', function(event, d) {
                 let countryName = d.properties.name;
-                let info = vis.countryInfo[countryName];
+                let info = vis.findCountryInfo(countryName);
 
                 d3.select(this)
                     .attr('stroke-width', '0.5px')

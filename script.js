@@ -987,12 +987,30 @@
     });
   }
 
+  function setupExploreDataButton() {
+    const exploreBtn = document.getElementById('explore-data-btn');
+    if (!exploreBtn || scenes.length < 2) return;
+
+    exploreBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      const nextScene = scenes[1]; // section2 is at index 1
+      if (!nextScene) return;
+
+      nextScene.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'start'
+      });
+      setActiveScene(1);
+    });
+  }
+
   function init() {
     buildDotRail();
     setActiveScene(0);
     setupIntersectionHighlight();
     setupMagnetic();
     initGlitch();
+    setupExploreDataButton();
     initAttackVisualization();
     initIndustryVisualization();
     initLinkedAttackCharts();
@@ -1040,7 +1058,7 @@ function handleSubmit(event) {
         
         // Show different message based on whether they got it right
         if (difference === 0) {
-            resultMessage.textContent = 'Perfect! Lucky guess or are you part of the organization? That is the correct answer.';
+            resultMessage.textContent = 'Perfect! Lucky guess or did you look it up? That is the correct answer.';
         } else {
             resultMessage.textContent = `Nice try. You were off by ${difference.toLocaleString()} attacks. The correct answer is ${correctAnswer.toLocaleString()} attacks per day.`;
         }
@@ -1058,7 +1076,7 @@ function handleSubmit(event) {
 
   const width = 820;
   const height = 520;
-  const margin = { top: 60, right: 40, bottom: 40, left: 80 };
+  const margin = { top: 60, right: 40, bottom: 70, left: 80 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -1149,7 +1167,7 @@ function handleSubmit(event) {
           return `M${a.x},${a.y} C${cx1},${a.y} ${cx2},${b.y} ${b.x},${b.y}`;
         };
 
-        // Draw links
+        // Draw links (no tooltips on links)
         const link = svg.append('g')
           .attr('fill', 'none')
           .selectAll('path')
@@ -1159,23 +1177,7 @@ function handleSubmit(event) {
           .attr('d', d => linkPath(d.source, d.target))
           .attr('stroke', d => assocColor(d.centered))
           .attr('stroke-width', d => 0.8 + 5.2 * Math.min(1, Math.abs(d.centered)))
-          .attr('stroke-opacity', d => 0.18 + 0.62 * Math.min(1, Math.abs(d.centered)))
-          .on('mouseover', function (event, d) {
-            d3.select(this).classed('hover', true);
-            tooltip.classed('show', true)
-              .html(`
-                <div><strong>${d.meta.attack}</strong> → <strong>${d.meta.tool}</strong></div>
-                <div>Observed: ${d.meta.obs.toLocaleString()}</div>
-                <div>Expected: ${d.meta.expected.toFixed(1)}</div>
-                <div>Lift: ${d.meta.lift.toFixed(2)} | PMI: ${isFinite(d.meta.pmi) ? d.meta.pmi.toFixed(2) : '-∞'}</div>
-              `)
-              .style('left', (event.pageX + 12) + 'px')
-              .style('top', (event.pageY - 28) + 'px');
-          })
-          .on('mouseout', function () {
-            d3.select(this).classed('hover', false);
-            tooltip.classed('show', false);
-          });
+          .attr('stroke-opacity', d => 0.18 + 0.62 * Math.min(1, Math.abs(d.centered)));
 
         // Draw nodes
         const nodes = [...attackNodes, ...toolNodes];
@@ -1187,7 +1189,69 @@ function handleSubmit(event) {
           .attr('cx', d => d.x)
           .attr('cy', d => d.y)
           .attr('r', 18)
-          .on('mouseover', function (_, d) {
+          .on('mouseover', function (event, d) {
+            // Create description based on type
+            let description = '';
+            if (d.type === 'attack') {
+              const attackDescriptions = {
+                'Brute Force': 'Automated attempts to guess passwords or credentials through trial and error',
+                'Business Email Compromise': 'Sophisticated email attacks targeting businesses to initiate fraudulent wire transfers',
+                'Credential Stuffing': 'Using stolen credentials from one service to gain unauthorized access to other accounts',
+                'Cross-Site Scripting': 'Injection of malicious scripts into web pages viewed by other users',
+                'DDoS': 'Distributed Denial of Service attacks that overwhelm systems with traffic',
+                'Insider Threat': 'Security risks from employees, contractors, or partners with authorized access',
+                'Malware': 'Malicious software designed to damage, disrupt, or gain unauthorized access to systems',
+                'Phishing': 'Deceptive emails or messages designed to trick users into revealing sensitive information',
+                'Ransomware': 'Malware that encrypts files and demands payment for decryption',
+                'SQL Injection': 'Exploitation of database vulnerabilities by injecting malicious SQL code',
+                'Supply Chain Compromise': 'Attacks targeting software vendors or third-party suppliers to reach end customers',
+                'Zero-Day Exploit': 'Attacks exploiting previously unknown vulnerabilities before patches are available'
+              };
+              description = attackDescriptions[d.name] || 'A type of cyber attack';
+            } else {
+              const toolDescriptions = {
+                'Account Lockout': 'Automatically locks accounts after failed login attempts',
+                'Antivirus': 'Scans and removes malicious software from systems',
+                'CDN Scrubbing': 'Filters and blocks malicious traffic at the network edge',
+                'Content Security Policy': 'Prevents XSS attacks by controlling which resources can be loaded',
+                'DDoS Mitigation': 'Services that filter and absorb distributed denial of service attacks',
+                'DMARC': 'Email authentication protocol that prevents email spoofing',
+                'Database Firewall': 'Monitors and blocks unauthorized database access attempts',
+                'EDR': 'Endpoint Detection and Response - monitors endpoints for suspicious activity',
+                'Email Filtering': 'Scans and blocks malicious emails before they reach users',
+                'Firewall': 'Network security device that filters traffic based on security rules',
+                'IDS': 'Intrusion Detection System - monitors network traffic for suspicious activity',
+                'MFA': 'Multi-Factor Authentication - requires multiple forms of verification',
+                'Offline Backups': 'Backup copies stored offline to prevent ransomware encryption',
+                'SIEM': 'Security Information and Event Management - aggregates and analyzes security logs',
+                'WAF': 'Web Application Firewall - protects web applications from various attacks'
+              };
+              description = toolDescriptions[d.name] || 'A security tool or measure';
+            }
+            
+            // Show tooltip with node name and description
+            tooltip.classed('show', true)
+              .html(`<div><strong>${d.name}</strong></div><div style="margin-top: 0.25rem; font-size: 0.85em; opacity: 0.9;">${description}</div>`);
+            
+            // Position tooltip to the left for attack types, right for tools
+            // For attack types, position well to the left of cursor
+            if (d.type === 'attack') {
+              // Position to the left of cursor - use transform to ensure it's positioned correctly
+              tooltip
+                .style('left', (event.pageX - 250) + 'px')
+                .style('right', 'auto')
+                .style('transform', 'none');
+            } else {
+              // Position to the right of cursor
+              tooltip
+                .style('left', (event.pageX + 12) + 'px')
+                .style('right', 'auto')
+                .style('transform', 'none');
+            }
+            tooltip
+              .style('top', (event.pageY - 28) + 'px')
+              .style('margin', '0');
+            
             // Highlight connected links and blur others
             link.each(function(l) {
               const isConnected = l.source.id === d.id || l.target.id === d.id;
@@ -1206,7 +1270,26 @@ function handleSubmit(event) {
                 .style('filter', isConnected ? 'none' : 'blur(2px)');
             });
           })
-          .on('mouseout', function () { 
+          .on('mousemove', function(event, d) {
+            if (d.type === 'attack') {
+              // Position to the left of cursor
+              tooltip
+                .style('left', (event.pageX - 250) + 'px')
+                .style('right', 'auto')
+                .style('transform', 'none');
+            } else {
+              // Position to the right of cursor
+              tooltip
+                .style('left', (event.pageX + 12) + 'px')
+                .style('right', 'auto')
+                .style('transform', 'none');
+            }
+            tooltip
+              .style('top', (event.pageY - 28) + 'px')
+              .style('margin', '0');
+          })
+          .on('mouseout', function () {
+            tooltip.classed('show', false);
             link.classed('hover', false)
               .style('opacity', null)
               .style('filter', null);
@@ -1214,16 +1297,96 @@ function handleSubmit(event) {
               .style('filter', null);
           });
 
-        // Labels
+        // Labels - positioned to avoid covering visualization
+        // Left side (attack types): text appears to the left of nodes
+        // Right side (tools): text appears to the right of nodes
         svg.append('g')
           .selectAll('text')
           .data(nodes)
           .enter().append('text')
           .attr('class', 'network-node-label')
           .text(d => d.name)
-          .attr('x', d => d.x + (d.type === 'attack' ? -85 : 85))
+          .attr('x', d => d.type === 'attack' ? d.x - 90 : d.x + 90)
           .attr('y', d => d.y + 4)
           .attr('text-anchor', d => d.type === 'attack' ? 'end' : 'start');
+
+        // Add legend at bottom center of chart
+        const legendWidth = 220;
+        const legendX = (innerWidth - legendWidth) / 2;
+        const legendY = innerHeight + 32; // Moved down more
+        
+        const legendGroup = svg.append('g')
+          .attr('class', 'chart-legend')
+          .attr('transform', `translate(${legendX}, ${legendY})`);
+        
+        // Title - centered
+        legendGroup.append('text')
+          .attr('class', 'legend-title')
+          .attr('x', legendWidth / 2)
+          .attr('y', -3)
+          .attr('text-anchor', 'middle')
+          .attr('fill', '#e6edf7')
+          .attr('font-size', '0.8rem')
+          .attr('font-weight', '600')
+          .text('Association strength');
+        
+        // Gradient bar - check if defs already exists
+        let defs = svg.select('defs');
+        if (defs.empty()) {
+          defs = svg.append('defs');
+        }
+        
+        // Remove existing gradient if it exists
+        defs.select('#legend-gradient').remove();
+        
+        const gradientDef = defs.append('linearGradient')
+          .attr('id', 'legend-gradient')
+          .attr('x1', '0%')
+          .attr('x2', '100%');
+        
+        gradientDef.append('stop')
+          .attr('offset', '0%')
+          .attr('stop-color', 'rgba(102,224,255,0.25)');
+        
+        gradientDef.append('stop')
+          .attr('offset', '50%')
+          .attr('stop-color', 'rgba(102,224,255,0.4)');
+        
+        gradientDef.append('stop')
+          .attr('offset', '100%')
+          .attr('stop-color', 'rgba(200,120,255,0.95)');
+        
+        legendGroup.append('rect')
+          .attr('class', 'legend-gradient-bar')
+          .attr('x', 0)
+          .attr('y', 3)
+          .attr('width', legendWidth)
+          .attr('height', 11)
+          .attr('rx', 6)
+          .attr('fill', 'url(#legend-gradient)')
+          .attr('stroke', 'rgba(102,224,255,0.35)')
+          .attr('stroke-width', 1.5);
+        
+        // Labels below gradient - centered at ends
+        legendGroup.append('text')
+          .attr('class', 'legend-label-left')
+          .attr('x', 0)
+          .attr('y', 30)
+          .attr('text-anchor', 'middle')
+          .attr('fill', 'rgba(102,224,255,0.9)')
+          .attr('font-size', '0.75rem')
+          .attr('font-weight', '500')
+          .text('Weak connection');
+        
+        legendGroup.append('text')
+          .attr('class', 'legend-label-right')
+          .attr('x', legendWidth)
+          .attr('y', 30)
+          .attr('text-anchor', 'middle')
+          .attr('fill', 'rgba(200,120,255,1)')
+          .attr('font-size', '0.75rem')
+          .attr('font-weight', '500')
+          .text('Strong connection');
 
         // Simple fade-in
         link.style('opacity', 0).transition().duration(500).style('opacity', 1);
