@@ -46,7 +46,7 @@ class CrimeMapVisual {
         // Get container dimensions dynamically
         const bbox = this.container.node().getBoundingClientRect();
         const width = bbox.width || 600;
-        const height = 400; // Fixed height for smaller map
+        const height = Math.min(width * 0.7, 550); // Height proportional to width, max 550px
 
         // Append SVG
         const svg = vis.container.append("svg")
@@ -161,7 +161,7 @@ class CrimeMapVisual {
         d3.select("#loss-title").text(`${stateName}: Crime Loss Breakdown`);
         d3.select("#loss-title").node().nextElementSibling.textContent = `Total Loss: $${(stateData.totalCrimeLoss / 1000000).toFixed(2)}M`;
 
-        this.drawPieChart("#loss-pie-chart", data, 280);
+        this.drawPieChart("#loss-pie-chart", data, 240);
     }
 
     updateAgePieChart(stateName, stateData) {
@@ -180,7 +180,7 @@ class CrimeMapVisual {
         d3.select("#age-title").text(`${stateName}: Victim Age Distribution`);
         d3.select("#age-title").node().nextElementSibling.textContent = `Total Victims: ${totalVictims.toLocaleString()}`;
 
-        this.drawPieChart("#age-pie-chart", data, 320);
+        this.drawPieChart("#age-pie-chart", data, 240);
     }
 
     drawPieChart(containerId, data, size = 320) {
@@ -191,7 +191,10 @@ class CrimeMapVisual {
         const height = size;
         const radius = Math.min(width, height) / 2 - 20;
 
-        const svg = container.append("svg")
+        // Create wrapper for SVG
+        const svgContainer = container.append("div");
+        
+        const svg = svgContainer.append("svg")
             .attr("width", width)
             .attr("height", height)
             .append("g")
@@ -262,8 +265,7 @@ class CrimeMapVisual {
 
         // Add legend
         const legend = container.append("div")
-            .attr("class", "pie-legend")
-            .style("margin-top", "24px");
+            .attr("class", "pie-legend");
 
         data.forEach(d => {
             const item = legend.append("div")
