@@ -317,7 +317,6 @@
         { id: "Wall Street (Finance Hub)", type: "finance" },
         { id: "Media Networks", type: "media" },
         { id: "Cell Towers", type: "communication" },
-        { id: "Emergency Call Centers (911)", type: "emergency" },
         { id: "Traffic Control System", type: "transport" }
     ];
 
@@ -347,9 +346,6 @@
         ["Traffic Control System", "Subway System"],
         ["Police Department", "City Hall (Gov't)"],
         ["Fire Department", "City Hall (Gov't)"],
-        ["Emergency Call Centers (911)", "Internet Backbone"],
-        ["Emergency Call Centers (911)", "Cell Towers"],
-        ["Emergency Call Centers (911)", "Police Department"],
         ["Internet Backbone", "Media Networks"],
         ["Internet Backbone", "Cell Towers"],
         ["Media Networks", "Wall Street (Finance Hub)"],
@@ -394,7 +390,7 @@
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id).distance(120))
         .force("charge", d3.forceManyBody().strength(-350))
-        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("center", d3.forceCenter(width / 1.7, height / 2.5))
         .on("tick", ticked);
 
     const linkElems = attackSvg.append("g").selectAll("line")
@@ -526,7 +522,7 @@
             .style('z-index', '1000')
             .style('opacity', 0);
 
-        // Load your CSV file
+        // Load CSV file
         d3.csv('data/Cybersecurity_Incidents_Database.csv').then(rawData => {
             // Count how many attacks per industry
             const industryCounts = d3.rollups(
