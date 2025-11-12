@@ -450,44 +450,38 @@
             });
     }
 
-    function startAttack(sourceNode) {
-        markNodeState(sourceNode, "attacked");
+      function startAttack(sourceNode) {
+          // Mark clicked node first
+          markNodeState(sourceNode, "attacked");
 
-        const queue = [sourceNode];
-        const visited = new Set([sourceNode.id]);
+          // Optional: small animation delay for cascade effect
+          let delay = 0;
+          nodes.forEach(node => {
+              if (node.id !== sourceNode.id) {
+                  setTimeout(() => {
+                      markNodeState(node, "attacked");
+                  }, delay);
+                  delay += 150; // small staggered delay for nice animation
+              }
+          });
 
-        function step() {
-            if (queue.length === 0) {
-                return;
-            }
-            const current = queue.shift();
-            const ruleSet = propagationRules[current.type] || propagationRules.default;
-            markNodeState(current, "propagating");
+          // Optional status text update
+          const status = document.getElementById("statusText");
+          if (status) {
+              status.textContent = `Status: ${sourceNode.id} compromised — total network collapse simulated`;
+          }
+          // Update informational message after attack
+          const info = document.getElementById("infoMessage");
+          if (info) {
+              info.innerHTML = `
+        <strong>${sourceNode.id}</strong> was compromised, triggering a chain reaction that disabled every critical system,
+        from transportation and healthcare to communication and power. 
+        <br><br><em>This demonstrates how a single breach can paralyze an entire city’s infrastructure.</em>
+    `;
+          }
 
-            ruleSet.forEach(rule => {
-                const candidates = nodes.filter(n =>
-                    n.type === rule.targetType &&
-                    n.state !== "attacked" &&
-                    links.some(l => (l.source.id === current.id && l.target.id === n.id) ||
-                        (l.target.id === current.id && l.source.id === n.id))
-                );
+      }
 
-                candidates.forEach((cand, i) => {
-                    if (Math.random() <= rule.prob) {
-                        setTimeout(() => {
-                            if (cand.state === "safe" || !cand.state) {
-                                markNodeState(cand, "attacked");
-                                queue.push(cand);
-                                step();
-                            }
-                        }, rule.delay + i * 200);
-                    }
-                });
-            });
-        }
-
-        step();
-    }
   }
     function initIndustryVisualization() {
         const industryContainer = document.querySelector('#section7 .placeholder');
