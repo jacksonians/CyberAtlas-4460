@@ -700,6 +700,14 @@
 
     // Load data
     d3.csv('data/Cybersecurity_Incidents_Database.csv').then(rawData => {
+      // Parse dates and filter valid entries
+      rawData = rawData.map(d => ({
+        ...d,
+        parsedDate: d.date ? new Date(d.date) : null
+      })).filter(d => d.parsedDate !== null);
+
+      console.log('Loaded', rawData.length, 'attacks with dates');
+
       // Count attacks by type
       const attackCounts = d3.rollups(
         rawData,
@@ -711,38 +719,28 @@
       // Get top attack types for better visualization
       const topAttackTypes = attackCounts.slice(0, 7).map(d => d.type);
 
-      // Generate temporal data (simulate monthly data over 2 years)
-      const months = [];
-      const startDate = new Date(2022, 0, 1);
-      for (let i = 0; i < 24; i++) {
-        const date = new Date(2022, i, 1);
-        months.push(date);
-      }
+      // Group data by month using actual dates
+      const timeParser = d3.timeFormat('%Y-%m');
+      const dataByMonth = d3.rollups(
+        rawData,
+        v => v,
+        d => timeParser(d.parsedDate)
+      );
 
-      // Simulate temporal distribution with realistic trends
-      const temporalData = months.map((month, i) => {
-        const dataPoint = { date: month };
-        const progress = i / 23; // 0 to 1 over time
+      // Create temporal data from actual dates
+      const temporalData = dataByMonth.map(([monthKey, attacks]) => {
+        const dataPoint = { 
+          date: new Date(monthKey + '-01'),
+          monthKey: monthKey
+        };
         
+        // Count each attack type for this month
         topAttackTypes.forEach(type => {
-          const baseCount = attackCounts.find(d => d.type === type).count;
-          const monthlyBase = baseCount / 24;
-          
-          // Add trends and seasonality
-          let trend = 1;
-          if (type === 'Ransomware') trend = 1 + progress * 0.8; // Growing
-          if (type === 'Phishing') trend = 1 + progress * 0.6; // Growing
-          if (type === 'Zero-Day Exploit') trend = 1 + progress * 0.5;
-          if (type === 'DDoS') trend = 1 + Math.sin(progress * Math.PI * 2) * 0.3; // Cyclical
-          if (type === 'Malware') trend = 1.2 - progress * 0.2; // Declining slightly
-          
-          // Add some randomness
-          const randomFactor = 0.8 + Math.random() * 0.4;
-          dataPoint[type] = Math.round(monthlyBase * trend * randomFactor);
+          dataPoint[type] = attacks.filter(a => a.attack_type === type).length;
         });
         
         return dataPoint;
-      });
+      }).sort((a, b) => a.date - b.date);
 
       // Color scale
       const colorScale = d3.scaleOrdinal()
