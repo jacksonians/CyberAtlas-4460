@@ -1,0 +1,4 @@
+metric,value,unit,source
+lateral_movement_time,18,minutes,ReliaQuest
+simulation_scale,20,minutes_per_second,derived
+

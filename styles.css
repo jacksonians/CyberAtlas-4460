@@ -1197,6 +1197,7 @@ body::after {
   z-index: 1;
   border-radius: calc(var(--radius) - 4px);
   background: rgba(7, 11, 23, 0.3);
+  overflow: visible;
 }
 
 @keyframes perimeter {
@@ -1601,6 +1602,19 @@ body::after {
 .network-node.tool { fill: #6BFFA8; stroke: rgba(107,255,168,0.5); }
 .network-node:hover { stroke-width: 3; filter: brightness(1.2); }
 
+/* Selected node state - visually "locked on" with stronger border and glow */
+.network-node.selected {
+  stroke-width: 4;
+  stroke: rgba(255,255,255,0.9);
+  filter: brightness(1.25) drop-shadow(0 0 6px rgba(255,255,255,0.5));
+}
+.network-node.selected.attack {
+  filter: brightness(1.25) drop-shadow(0 0 6px rgba(255,107,157,0.7));
+}
+.network-node.selected.tool {
+  filter: brightness(1.25) drop-shadow(0 0 6px rgba(107,255,168,0.7));
+}
+
 .network-node-label { font-size: 11px; font-weight: 500; text-anchor: middle; dominant-baseline: middle; pointer-events: none; fill: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.7); }
 
 /* Network links */
@@ -1609,3 +1623,18 @@ body::after {
 
 .network-tooltip { position: absolute; background: rgba(15,23,42,0.98); border: 1px solid rgba(102,224,255,0.4); border-radius: 12px; padding: 0.9rem 1rem; font-size: 0.88rem; color: var(--text-primary); pointer-events: none; opacity: 0; transition: opacity 0.2s ease; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(102,224,255,0.2); z-index: 1000; max-width: 220px; white-space: normal; }
 .network-tooltip.show { opacity: 1; }
+
+/* Node spread visualization legend */
+.spread-legend {
+    position: relative;
+}
+
+.spread-legend::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    pointer-events: none;
+    z-index: -1;
+}

@@ -299,6 +299,10 @@
         city: "#2f80ed",
     };
 
+    // Load breakout time data from CSV (will be used later)
+    let breakoutTimeMinutes = 18; // default fallback
+    let simulationScale = 20; // default fallback
+
     const nodes = [
         { id: "New York City", type: "city" },
         { id: "Power Grid (Con Edison)", type: "utility" },
@@ -422,6 +426,82 @@
         .attr("fill", "#e6edf7")
         .attr("dy", -20);
 
+    // Build neighbor map for efficient lookup
+    const neighborMap = new Map();
+    nodes.forEach(node => {
+        neighborMap.set(node.id, []);
+    });
+    links.forEach(link => {
+        const sourceId = typeof link.source === 'string' ? link.source : link.source.id;
+        const targetId = typeof link.target === 'string' ? link.target : link.target.id;
+        neighborMap.get(sourceId).push(targetId);
+        neighborMap.get(targetId).push(sourceId);
+    });
+
+    // Create legend as HTML element outside SVG
+    const legendDiv = d3.select("#attackViz")
+        .append("div")
+        .attr("class", "spread-legend")
+        .style("position", "absolute")
+        .style("right", "10px")
+        .style("top", "350px")
+        .style("width", "280px")
+        .style("padding", "12px")
+        .style("background", "rgba(7, 11, 23, 0.5)")
+        .style("border", "1px solid rgba(255, 255, 255, 0.1)")
+        .style("border-radius", "12px")
+        .style("backdrop-filter", "blur(8px)")
+        .style("box-shadow", "0 4px 12px rgba(0,0,0,0.3)")
+        .style("z-index", "10");
+
+    legendDiv.append("div")
+        .style("font-size", "12px")
+        .style("font-weight", "600")
+        .style("color", "#66e0ff")
+        .style("margin-bottom", "8px")
+        .text("Real-world lateral movement speed:");
+
+    legendDiv.append("div")
+        .style("font-size", "10px")
+        .style("color", "#e6edf7")
+        .style("margin-bottom", "4px")
+        .text("Cyberattacks spread to the next network");
+
+    const legendLine2 = legendDiv.append("div")
+        .attr("id", "legend-breakout-time")
+        .style("font-size", "10px")
+        .style("color", "#e6edf7")
+        .style("margin-bottom", "4px")
+        .text(`in ~${breakoutTimeMinutes} minutes on average`);
+
+    legendDiv.append("div")
+        .style("font-size", "9px")
+        .style("color", "#94a3b8")
+        .style("font-style", "italic")
+        .style("margin-bottom", "8px")
+        .text("(Source: ReliaQuest)");
+
+    const legendScale = legendDiv.append("div")
+        .attr("id", "legend-scale")
+        .style("font-size", "10px")
+        .style("color", "#e6edf7")
+        .text(`In this simulation, 1 second ≈ ${simulationScale} minutes.`);
+
+    // Load and update legend text from CSV
+    d3.csv("data/breakout_time.csv").then(data => {
+        data.forEach(row => {
+            if (row.metric === "lateral_movement_time") {
+                breakoutTimeMinutes = parseFloat(row.value);
+                d3.select("#legend-breakout-time").text(`in ~${breakoutTimeMinutes} minutes on average`);
+            } else if (row.metric === "simulation_scale") {
+                simulationScale = parseFloat(row.value);
+                d3.select("#legend-scale").text(`In this simulation, 1 second ≈ ${simulationScale} minutes.`);
+            }
+        });
+    }).catch(err => {
+        console.warn("Could not load breakout_time.csv, using defaults:", err);
+    });
+
     function ticked() {
         linkElems
             .attr("x1", d => d.source.x)
@@ -451,35 +531,71 @@
     }
 
       function startAttack(sourceNode) {
-          // Mark clicked node first
-          markNodeState(sourceNode, "attacked");
-
-          // Optional: small animation delay for cascade effect
-          let delay = 0;
+          // Reset all nodes to safe state first
           nodes.forEach(node => {
-              if (node.id !== sourceNode.id) {
-                  setTimeout(() => {
-                      markNodeState(node, "attacked");
-                  }, delay);
-                  delay += 150; // small staggered delay for nice animation
+              if (node.state !== undefined) {
+                  markNodeState(node, "safe");
               }
           });
 
-          // Optional status text update
-          const status = document.getElementById("statusText");
-          if (status) {
-              status.textContent = `Status: ${sourceNode.id} compromised — total network collapse simulated`;
+          // Mark clicked node as attacked
+          markNodeState(sourceNode, "attacked");
+
+          // Track infected nodes and queue of nodes to process
+          const infected = new Set([sourceNode.id]);
+          const queue = [sourceNode.id];
+          let timeElapsed = 0; // in seconds
+
+          // Function to infect one neighbor per second
+          function spreadInfection() {
+              if (queue.length === 0) {
+                  // All nodes that can be reached are infected
+                  return;
+              }
+
+              // Get the next node to spread from
+              const currentId = queue.shift();
+              const neighbors = neighborMap.get(currentId) || [];
+              
+              // Find uninfected neighbors
+              const uninfectedNeighbors = neighbors
+                  .map(id => nodes.find(n => n.id === id))
+                  .filter(node => node && !infected.has(node.id));
+
+              if (uninfectedNeighbors.length > 0) {
+                  // Infect one random neighbor
+                  const nextNode = uninfectedNeighbors[Math.floor(Math.random() * uninfectedNeighbors.length)];
+                  infected.add(nextNode.id);
+                  markNodeState(nextNode, "attacked");
+                  queue.push(nextNode.id); // Add to queue to spread from it next
+              }
+
+              // Continue spreading every 1 second (1000ms)
+              if (queue.length > 0) {
+                  setTimeout(spreadInfection, 1000);
+              } else {
+                  // Update informational message when spread completes
+                  const info = document.getElementById("infoMessage");
+                  if (info) {
+                      info.innerHTML = `
+            <strong>${sourceNode.id}</strong> was compromised, triggering a chain reaction that disabled ${infected.size} critical system${infected.size > 1 ? 's' : ''},
+            from transportation and healthcare to communication and power. 
+            <br><br><em>This demonstrates how a single breach can paralyze an entire city's infrastructure.</em>
+        `;
+                  }
+              }
           }
-          // Update informational message after attack
+
+          // Start the infection spread
+          setTimeout(spreadInfection, 1000); // First infection after 1 second
+
+          // Update informational message immediately
           const info = document.getElementById("infoMessage");
           if (info) {
               info.innerHTML = `
-        <strong>${sourceNode.id}</strong> was compromised, triggering a chain reaction that disabled every critical system,
-        from transportation and healthcare to communication and power. 
-        <br><br><em>This demonstrates how a single breach can paralyze an entire city’s infrastructure.</em>
+        <strong>${sourceNode.id}</strong> was compromised. Watch as the attack spreads to connected systems...
     `;
           }
-
       }
 
   }
@@ -1079,6 +1195,10 @@ function handleSubmit(event) {
     .append('div')
     .attr('class', 'network-tooltip');
 
+  // Track selected nodes (multi-selection allowed)
+  // Uses a Set of node IDs for efficient lookup
+  const selectedNodes = new Set();
+
   // Diverging color scale: under-expected -> neutral -> over-expected
   const colorUnder = d3.rgb(102, 224, 255, 0.25); // cyan, faint
   const colorOver = d3.rgb(168, 137, 255, 0.85); // purple, strong
@@ -1121,6 +1241,7 @@ function handleSubmit(event) {
       }
 
       function renderNetwork(currentRows) {
+        // Note: selectedNodes Set persists across re-renders (defined in outer scope)
         svg.selectAll('*').remove();
 
         const { attacks, tools, matrix, meta } = computeAssociation(currentRows);
@@ -1173,10 +1294,30 @@ function handleSubmit(event) {
           .selectAll('circle')
           .data(nodes)
           .enter().append('circle')
-          .attr('class', d => `network-node ${d.type}`)
+          .attr('class', d => {
+            let classes = `network-node ${d.type}`;
+            // Mark as selected if in the selected set
+            if (selectedNodes.has(d.id)) {
+              classes += ' selected';
+            }
+            return classes;
+          })
           .attr('cx', d => d.x)
           .attr('cy', d => d.y)
           .attr('r', 18)
+          .on('click', function (event, d) {
+            event.stopPropagation();
+            // Toggle selection: add or remove from selected set
+            if (selectedNodes.has(d.id)) {
+              selectedNodes.delete(d.id);
+              d3.select(this).classed('selected', false);
+            } else {
+              selectedNodes.add(d.id);
+              d3.select(this).classed('selected', true);
+            }
+            // Update highlights based on current selection (no hover)
+            updateHighlights(null);
+          })
           .on('mouseover', function (event, d) {
             // Create description based on type
             let description = '';
@@ -1240,23 +1381,8 @@ function handleSubmit(event) {
               .style('top', (event.pageY - 28) + 'px')
               .style('margin', '0');
             
-            // Highlight connected links and blur others
-            link.each(function(l) {
-              const isConnected = l.source.id === d.id || l.target.id === d.id;
-              d3.select(this)
-                .classed('hover', isConnected)
-                .style('opacity', isConnected ? 1 : 0.08)
-                .style('filter', isConnected ? 'none' : 'blur(1px)');
-            });
-            // Highlight connected nodes and blur others
-            node.each(function(n) {
-              const isConnected = n.id === d.id || 
-                links.some(l => (l.source.id === d.id && l.target.id === n.id) || 
-                               (l.target.id === d.id && l.source.id === n.id));
-              d3.select(this)
-                .style('opacity', isConnected ? 1 : 0.2)
-                .style('filter', isConnected ? 'none' : 'blur(2px)');
-            });
+            // Update highlights: show selected set + hovered node
+            updateHighlights(d);
           })
           .on('mousemove', function(event, d) {
             if (d.type === 'attack') {
@@ -1278,12 +1404,68 @@ function handleSubmit(event) {
           })
           .on('mouseout', function () {
             tooltip.classed('show', false);
+            // Return to showing only selected nodes (no hover overlay)
+            updateHighlights(null);
+          });
+
+        /**
+         * Helper function to update node/link highlights based on:
+         * - The set of selected nodes (persistent)
+         * - The currently hovered node (temporary overlay)
+         * 
+         * Logic:
+         * 1. If nothing is selected and nothing is hovered: everything is in default state
+         * 2. If something is selected but nothing hovered: show union of all selected connections
+         * 3. If something is hovered (with or without selections): show union of selected + hovered
+         */
+        function updateHighlights(hoveredNode) {
+          // Build the "active set" = selected nodes + hovered node (if any)
+          const activeNodeIds = new Set(selectedNodes);
+          if (hoveredNode) {
+            activeNodeIds.add(hoveredNode.id);
+          }
+
+          // If no active nodes, reset everything to default
+          if (activeNodeIds.size === 0) {
             link.classed('hover', false)
               .style('opacity', null)
               .style('filter', null);
             node.style('opacity', null)
               .style('filter', null);
+            return;
+          }
+
+          // Otherwise, highlight links/nodes connected to any active node
+          link.each(function(l) {
+            const isActive = activeNodeIds.has(l.source.id) || activeNodeIds.has(l.target.id);
+            d3.select(this)
+              .classed('hover', isActive)
+              .style('opacity', isActive ? 1 : 0.08)
+              .style('filter', isActive ? 'none' : 'blur(1px)');
           });
+
+          node.each(function(n) {
+            // A node is active if it's in the active set OR connected to an active node
+            const isActive = activeNodeIds.has(n.id) || 
+              links.some(l => 
+                (activeNodeIds.has(l.source.id) && l.target.id === n.id) ||
+                (activeNodeIds.has(l.target.id) && l.source.id === n.id)
+              );
+            d3.select(this)
+              .style('opacity', isActive ? 1 : 0.2)
+              .style('filter', isActive ? 'none' : 'blur(2px)');
+          });
+        }
+
+        // Click on SVG background to clear all selections
+        svg.on('click', function(event) {
+          // Only clear if clicking the background (not a node)
+          if (event.target === this || event.target.tagName === 'rect') {
+            selectedNodes.clear();
+            node.classed('selected', false);
+            updateHighlights(null);
+          }
+        });
 
         // Labels - positioned to avoid covering visualization
         // Left side (attack types): text appears to the left of nodes
@@ -1297,6 +1479,11 @@ function handleSubmit(event) {
           .attr('x', d => d.type === 'attack' ? d.x - 90 : d.x + 90)
           .attr('y', d => d.y + 4)
           .attr('text-anchor', d => d.type === 'attack' ? 'end' : 'start');
+
+        // Apply initial highlights if any nodes are selected
+        if (selectedNodes.size > 0) {
+          updateHighlights(null);
+        }
 
         // Add legend at bottom center of chart
         const legendWidth = 220;
