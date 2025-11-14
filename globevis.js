@@ -5,7 +5,7 @@ class MapVis {
         this.geoData = geoData;
         this.cyberData = cyberData;
 
-        // Define colors - green gradient for cybersecurity metrics
+        // Define colors
         this.colors = ['#2d5016', '#4a7c34', '#5cb85c', '#7ef77e'];
 
         this.initVis();

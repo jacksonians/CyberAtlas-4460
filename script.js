@@ -63,7 +63,6 @@
 
   function setupIntersectionHighlight() {
     if (hasGSAP && !reduceMotion) {
-      // ScrollTrigger handles active states when enabled.
       return;
     }
 
@@ -426,7 +425,7 @@
         .attr("fill", "#e6edf7")
         .attr("dy", -20);
 
-    // Build neighbor map for efficient lookup
+    //Build neighbor
     const neighborMap = new Map();
     nodes.forEach(node => {
         neighborMap.set(node.id, []);
@@ -438,7 +437,7 @@
         neighborMap.get(targetId).push(sourceId);
     });
 
-    // Create legend as HTML element outside SVG
+    //Create legend
     const legendDiv = d3.select("#attackViz")
         .append("div")
         .attr("class", "spread-legend")
@@ -487,7 +486,7 @@
         .style("color", "#e6edf7")
         .text(`In this simulation, 1 second ≈ ${simulationScale} minutes.`);
 
-    // Load and update legend text from CSV
+    // Load and update legend
     d3.csv("data/breakout_time.csv").then(data => {
         data.forEach(row => {
             if (row.metric === "lateral_movement_time") {
@@ -531,29 +530,29 @@
     }
 
       function startAttack(sourceNode) {
-          // Reset all nodes to safe state first
+          // Reset all nodes
           nodes.forEach(node => {
               if (node.state !== undefined) {
                   markNodeState(node, "safe");
               }
           });
 
-          // Mark clicked node as attacked
+          // Mark clicked node
           markNodeState(sourceNode, "attacked");
 
-          // Track infected nodes and queue of nodes to process
+          //Track infected nodes and queue of nodes to process
           const infected = new Set([sourceNode.id]);
           const queue = [sourceNode.id];
           let timeElapsed = 0; // in seconds
 
-          // Function to infect one neighbor per second
+          //Function to infect one neighbor per second
           function spreadInfection() {
               if (queue.length === 0) {
                   // All nodes that can be reached are infected
                   return;
               }
 
-              // Get the next node to spread from
+              //Get the next node to spread from
               const currentId = queue.shift();
               const neighbors = neighborMap.get(currentId) || [];
               
@@ -567,14 +566,14 @@
                   const nextNode = uninfectedNeighbors[Math.floor(Math.random() * uninfectedNeighbors.length)];
                   infected.add(nextNode.id);
                   markNodeState(nextNode, "attacked");
-                  queue.push(nextNode.id); // Add to queue to spread from it next
+                  queue.push(nextNode.id);
               }
 
-              // Continue spreading every 1 second (1000ms)
+              // Continue spreading
               if (queue.length > 0) {
                   setTimeout(spreadInfection, 1000);
               } else {
-                  // Update informational message when spread completes
+                  // Update informational message
                   const info = document.getElementById("infoMessage");
                   if (info) {
                       info.innerHTML = `
@@ -587,9 +586,9 @@
           }
 
           // Start the infection spread
-          setTimeout(spreadInfection, 1000); // First infection after 1 second
+          setTimeout(spreadInfection, 1000);
 
-          // Update informational message immediately
+          // Update informational message
           const info = document.getElementById("infoMessage");
           if (info) {
               info.innerHTML = `
@@ -641,7 +640,7 @@
                 d => d.industry
             ).map(([industry, attacks]) => ({ industry, attacks }));
 
-            // ✅ Sort industries by number of attacks (descending)
+            // Sort industries by number of attacks
             industryCounts.sort((a, b) => d3.descending(a.attacks, b.attacks));
 
             // Tooltip impact descriptions
@@ -744,7 +743,7 @@
         });
     }
 
-  // Linked Attack Type Visualizations (Area Chart + Bar Chart)
+  //  Attack Type vis which are linked (Area Chart + Bar Chart)
   function initLinkedAttackCharts() {
     const section = document.querySelector('#section9');
     if (!section) return;
@@ -753,11 +752,11 @@
     const barCard = section.querySelector('.card:last-child .placeholder');
     if (!areaCard || !barCard) return;
 
-    // Also get the parent cards to adjust overflow
+    // Gets the parent cards which adjusts overflow
     const areaCardParent = section.querySelector('.card:first-child');
     const barCardParent = section.querySelector('.card:last-child');
     
-    // Clear placeholders and adjust styling
+    // Clear placeholders and changes the styling
     areaCard.innerHTML = '';
     barCard.innerHTML = '';
     areaCard.style.display = 'flex';
@@ -978,7 +977,7 @@
         .attr('font-size', '12px')
         .text('Attack Count');
 
-      // ==================== BAR CHART ====================
+      // Bar chart
       const barG = barSvg.append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
@@ -1141,7 +1140,7 @@
   });
 })();
 
-// Handle form submission for question (from CyberAtlas)
+// Handle form submission for question
 function handleSubmit(event) {
     event.preventDefault();
     const numberInput = document.getElementById('audience-question');
@@ -1168,12 +1167,12 @@ function handleSubmit(event) {
         }
         
         resultMessage.classList.add('show');
-    }, 500); // Match the CSS transition duration
+    }, 500);
     
     return false;
 }
 
-// ===== ATTACK–TOOL BIPARTITE NETWORK (Lift/PMI) =====
+// Attack tool Bipartite Network
 (function () {
   const container = d3.select('#attack-tool-network');
   if (container.empty()) return;
@@ -1195,13 +1194,12 @@ function handleSubmit(event) {
     .append('div')
     .attr('class', 'network-tooltip');
 
-  // Track selected nodes (multi-selection allowed)
-  // Uses a Set of node IDs for efficient lookup
+  // Track selected nodes
   const selectedNodes = new Set();
 
-  // Diverging color scale: under-expected -> neutral -> over-expected
-  const colorUnder = d3.rgb(102, 224, 255, 0.25); // cyan, faint
-  const colorOver = d3.rgb(168, 137, 255, 0.85); // purple, strong
+  // Diverging color scale
+  const colorUnder = d3.rgb(102, 224, 255, 0.25);
+  const colorOver = d3.rgb(168, 137, 255, 0.85);
   const assocColor = d3.scaleDiverging([-0.5, 0, 0.8], t =>
     d3.interpolateRgb(colorUnder, colorOver)(d3.scaleLinear().domain([-0.5, 0.8]).range([0, 1])(t))
   );
@@ -1241,12 +1239,12 @@ function handleSubmit(event) {
       }
 
       function renderNetwork(currentRows) {
-        // Note: selectedNodes Set persists across re-renders (defined in outer scope)
+        // Note: selectedNodes Set persists across re-renders
         svg.selectAll('*').remove();
 
         const { attacks, tools, matrix, meta } = computeAssociation(currentRows);
 
-        // Even vertical spacing for both sides
+        // Vertical spacing for both sides
         const attackScale = d3.scalePoint().domain(d3.range(attacks.length)).range([0, innerHeight]).padding(0.5);
         const toolScale = d3.scalePoint().domain(d3.range(tools.length)).range([0, innerHeight]).padding(0.5);
 
@@ -1276,7 +1274,7 @@ function handleSubmit(event) {
           return `M${a.x},${a.y} C${cx1},${a.y} ${cx2},${b.y} ${b.x},${b.y}`;
         };
 
-        // Draw links (no tooltips on links)
+        // Draw links
         const link = svg.append('g')
           .attr('fill', 'none')
           .selectAll('path')
@@ -1307,7 +1305,7 @@ function handleSubmit(event) {
           .attr('r', 18)
           .on('click', function (event, d) {
             event.stopPropagation();
-            // Toggle selection: add or remove from selected set
+            // Toggle selection
             if (selectedNodes.has(d.id)) {
               selectedNodes.delete(d.id);
               d3.select(this).classed('selected', false);
@@ -1315,7 +1313,7 @@ function handleSubmit(event) {
               selectedNodes.add(d.id);
               d3.select(this).classed('selected', true);
             }
-            // Update highlights based on current selection (no hover)
+            // Update highlights based on current selection
             updateHighlights(null);
           })
           .on('mouseover', function (event, d) {
@@ -1365,7 +1363,7 @@ function handleSubmit(event) {
             // Position tooltip to the left for attack types, right for tools
             // For attack types, position well to the left of cursor
             if (d.type === 'attack') {
-              // Position to the left of cursor - use transform to ensure it's positioned correctly
+              // Position to the left of cursor
               tooltip
                 .style('left', (event.pageX - 250) + 'px')
                 .style('right', 'auto')
@@ -1381,7 +1379,7 @@ function handleSubmit(event) {
               .style('top', (event.pageY - 28) + 'px')
               .style('margin', '0');
             
-            // Update highlights: show selected set + hovered node
+            // Update highlights
             updateHighlights(d);
           })
           .on('mousemove', function(event, d) {
@@ -1445,7 +1443,7 @@ function handleSubmit(event) {
           });
 
           node.each(function(n) {
-            // A node is active if it's in the active set OR connected to an active node
+            // A node is active if it's in the active set or connected to an active node
             const isActive = activeNodeIds.has(n.id) || 
               links.some(l => 
                 (activeNodeIds.has(l.source.id) && l.target.id === n.id) ||
@@ -1494,7 +1492,7 @@ function handleSubmit(event) {
           .attr('class', 'chart-legend')
           .attr('transform', `translate(${legendX}, ${legendY})`);
         
-        // Title - centered
+        // Title
         legendGroup.append('text')
           .attr('class', 'legend-title')
           .attr('x', legendWidth / 2)
@@ -1505,7 +1503,7 @@ function handleSubmit(event) {
           .attr('font-weight', '600')
           .text('Association strength');
         
-        // Gradient bar - check if defs already exists
+        // Gradient bar
         let defs = svg.select('defs');
         if (defs.empty()) {
           defs = svg.append('defs');
@@ -1542,7 +1540,7 @@ function handleSubmit(event) {
           .attr('stroke', 'rgba(102,224,255,0.35)')
           .attr('stroke-width', 1.5);
         
-        // Labels below gradient - centered at ends
+        // Labels below gradient
         legendGroup.append('text')
           .attr('class', 'legend-label-left')
           .attr('x', 0)
@@ -1563,7 +1561,7 @@ function handleSubmit(event) {
           .attr('font-weight', '500')
           .text('Strong connection');
 
-        // Simple fade-in
+        // Fade-in
         link.style('opacity', 0).transition().duration(500).style('opacity', 1);
         node.style('opacity', 0).transition().duration(600).delay(150).style('opacity', 1);
       }
@@ -1575,13 +1573,13 @@ function handleSubmit(event) {
 
 document.addEventListener("DOMContentLoaded", async function() {
     try {
-        // Load CSV data with all columns intact
+        // Load CSV data
         const csvData = await d3.csv("data/US_Cyber_Crimes.csv");
 
         console.log("CSV Data loaded:", csvData.length, "states");
         console.log("Sample data:", csvData[0]);
 
-        // Initialize map visualization
+        // Initialize map vis
         new CrimeMapVisual(
             "map-container",
             csvData,
