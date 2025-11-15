@@ -273,15 +273,14 @@
 
     setInterval(() => {
       glitch.classList.remove('active');
-      // Trigger reflow to restart animation
-      void glitch.offsetWidth; // eslint-disable-line no-unused-expressions
+      void glitch.offsetWidth;
       glitch.classList.add('active');
     }, 10000);
 
     glitch.classList.add('active');
   }
 
-  // Connected Nodes Attack Visualization (from CyberAtlas)
+  // Connected Nodes Attack Visualization
   function initAttackVisualization() {
     const attackVizContainer = document.getElementById('attackViz');
     if (!attackVizContainer) return;
@@ -298,9 +297,9 @@
         city: "#2f80ed",
     };
 
-    // Load breakout time data from CSV (will be used later)
-    let breakoutTimeMinutes = 18; // default fallback
-    let simulationScale = 20; // default fallback
+    // Load breakout time data from CSV
+    let breakoutTimeMinutes = 18;
+    let simulationScale = 20; 
 
     const nodes = [
         { id: "New York City", type: "city" },
@@ -743,7 +742,7 @@
         });
     }
 
-  //  Attack Type vis which are linked (Area Chart + Bar Chart)
+  //  Attack Type vis which are linked
   function initLinkedAttackCharts() {
     const section = document.querySelector('#section9');
     if (!section) return;
@@ -774,7 +773,7 @@
     if (areaCardParent) areaCardParent.style.overflow = 'visible';
     if (barCardParent) barCardParent.style.overflow = 'visible';
 
-    // Dimensions - fit within split container
+    // Dimensions
     const areaWidth = 480;
     const areaHeight = 400;
     const barWidth = 480;
@@ -859,7 +858,6 @@
       // State for linked highlighting
       let selectedType = null;
 
-      // ==================== AREA CHART ====================
       const areaG = areaSvg.append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
@@ -1077,7 +1075,7 @@
     });
   }
 
-  // Ability to check off items in checklist for Section 10
+  // Ability to check off items in checklist
   function initChecklist() {
     const checklistItems = document.querySelectorAll('.checklist li');
     
@@ -1096,7 +1094,7 @@
 
     exploreBtn.addEventListener('click', (event) => {
       event.preventDefault();
-      const nextScene = scenes[1]; // section2 is at index 1
+      const nextScene = scenes[1];
       if (!nextScene) return;
 
       nextScene.scrollIntoView({
@@ -1149,17 +1147,16 @@ function handleSubmit(event) {
     const userAnswer = parseInt(numberInput.value);
     const correctAnswer = 2244;
     
-    // Calculate how far off they were
+    // Calculate difference
     const difference = Math.abs(userAnswer - correctAnswer);
     
-    // Fade out the question and input
     questionContent.classList.add('fade-out');
     
-    // Wait for fade out animation, then show result
+    // Wait for fade out animation
     setTimeout(() => {
         questionContent.style.display = 'none';
         
-        // Show different message based on whether they got it right
+        // Show different messages based on accuracy
         if (difference === 0) {
             resultMessage.textContent = 'Perfect! Lucky guess or did you look it up? That is the correct answer.';
         } else {
@@ -1239,12 +1236,11 @@ function handleSubmit(event) {
       }
 
       function renderNetwork(currentRows) {
-        // Note: selectedNodes Set persists across re-renders
         svg.selectAll('*').remove();
 
         const { attacks, tools, matrix, meta } = computeAssociation(currentRows);
 
-        // Vertical spacing for both sides
+        // Vertical spacing
         const attackScale = d3.scalePoint().domain(d3.range(attacks.length)).range([0, innerHeight]).padding(0.5);
         const toolScale = d3.scalePoint().domain(d3.range(tools.length)).range([0, innerHeight]).padding(0.5);
 
@@ -1254,7 +1250,6 @@ function handleSubmit(event) {
         const attackNodes = attacks.map((name, i) => ({ id: `attack-${i}`, name, type: 'attack', x: leftX, y: attackScale(i) }));
         const toolNodes = tools.map((name, i) => ({ id: `tool-${i}`, name, type: 'tool', x: rightX, y: toolScale(i) }));
 
-        // All links (no threshold) so everything links to everything
         const links = [];
         for (let i = 0; i < attacks.length; i++) {
           for (let j = 0; j < tools.length; j++) {
@@ -1402,22 +1397,11 @@ function handleSubmit(event) {
           })
           .on('mouseout', function () {
             tooltip.classed('show', false);
-            // Return to showing only selected nodes (no hover overlay)
             updateHighlights(null);
           });
 
-        /**
-         * Helper function to update node/link highlights based on:
-         * - The set of selected nodes (persistent)
-         * - The currently hovered node (temporary overlay)
-         * 
-         * Logic:
-         * 1. If nothing is selected and nothing is hovered: everything is in default state
-         * 2. If something is selected but nothing hovered: show union of all selected connections
-         * 3. If something is hovered (with or without selections): show union of selected + hovered
-         */
         function updateHighlights(hoveredNode) {
-          // Build the "active set" = selected nodes + hovered node (if any)
+          // Build the "active set"
           const activeNodeIds = new Set(selectedNodes);
           if (hoveredNode) {
             activeNodeIds.add(hoveredNode.id);
@@ -1432,8 +1416,6 @@ function handleSubmit(event) {
               .style('filter', null);
             return;
           }
-
-          // Otherwise, highlight links/nodes connected to any active node
           link.each(function(l) {
             const isActive = activeNodeIds.has(l.source.id) || activeNodeIds.has(l.target.id);
             d3.select(this)
@@ -1443,7 +1425,6 @@ function handleSubmit(event) {
           });
 
           node.each(function(n) {
-            // A node is active if it's in the active set or connected to an active node
             const isActive = activeNodeIds.has(n.id) || 
               links.some(l => 
                 (activeNodeIds.has(l.source.id) && l.target.id === n.id) ||
@@ -1457,7 +1438,7 @@ function handleSubmit(event) {
 
         // Click on SVG background to clear all selections
         svg.on('click', function(event) {
-          // Only clear if clicking the background (not a node)
+          // Only clear if clicking the background
           if (event.target === this || event.target.tagName === 'rect') {
             selectedNodes.clear();
             node.classed('selected', false);
@@ -1465,9 +1446,7 @@ function handleSubmit(event) {
           }
         });
 
-        // Labels - positioned to avoid covering visualization
-        // Left side (attack types): text appears to the left of nodes
-        // Right side (tools): text appears to the right of nodes
+        // Labels
         svg.append('g')
           .selectAll('text')
           .data(nodes)
@@ -1478,7 +1457,7 @@ function handleSubmit(event) {
           .attr('y', d => d.y + 4)
           .attr('text-anchor', d => d.type === 'attack' ? 'end' : 'start');
 
-        // Apply initial highlights if any nodes are selected
+        // Apply initial highlights 
         if (selectedNodes.size > 0) {
           updateHighlights(null);
         }
@@ -1486,7 +1465,7 @@ function handleSubmit(event) {
         // Add legend at bottom center of chart
         const legendWidth = 220;
         const legendX = (innerWidth - legendWidth) / 2;
-        const legendY = innerHeight + 32; // Moved down more
+        const legendY = innerHeight + 32; 
         
         const legendGroup = svg.append('g')
           .attr('class', 'chart-legend')
@@ -1509,7 +1488,7 @@ function handleSubmit(event) {
           defs = svg.append('defs');
         }
         
-        // Remove existing gradient if it exists
+        // Remove existing gradient 
         defs.select('#legend-gradient').remove();
         
         const gradientDef = defs.append('linearGradient')
@@ -1566,7 +1545,7 @@ function handleSubmit(event) {
         node.style('opacity', 0).transition().duration(600).delay(150).style('opacity', 1);
       }
 
-      // Initial render with all data
+      // Initial render
       renderNetwork(rows);
     });
 })();

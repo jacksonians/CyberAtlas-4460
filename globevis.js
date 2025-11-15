@@ -77,12 +77,12 @@ class MapVis {
             .attr('class', 'legend')
             .attr('transform', `translate(${vis.width * 3 / 4}, ${vis.height - 50})`);
 
-        // Create scale for positioning rectangles
+        // Scale for positioning rectangles
         vis.legendScale = d3.scaleLinear()
             .domain([0, 100])
             .range([0, 120]);
 
-        // Draw colored rectangles
+        // Colored rectangles
         vis.legend.selectAll('.legend-rect')
             .data(vis.colors)
             .enter()
@@ -94,7 +94,7 @@ class MapVis {
             .attr('height', 10)
             .attr('fill', d => d);
 
-        // Add axis labels
+        // Axis labels
         vis.legendAxis = d3.axisBottom(vis.legendScale)
             .tickValues([0, 50, 100])
             .tickFormat(d => d);
@@ -151,12 +151,12 @@ class MapVis {
             'Vatican': 'Vatican City'
         };
 
-        // Create country info structure with cybersecurity data
+        // Country info structure with cybersecurity data
         vis.countryInfo = {};
         
         // Process the cyber data
         vis.cyberData.forEach(d => {
-            // Calculate average score from available metrics
+            // Average score from available metrics
             let scores = [];
             if (d.CEI && d.CEI !== '') scores.push(parseFloat(d.CEI) * 100);
             if (d.GCI && d.GCI !== '') scores.push(parseFloat(d.GCI));
@@ -165,7 +165,6 @@ class MapVis {
             
             let avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
             
-            // Determine color category
             let colorIndex;
             if (avgScore < 25) colorIndex = 0;
             else if (avgScore < 50) colorIndex = 1;

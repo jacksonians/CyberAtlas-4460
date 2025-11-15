@@ -1152,7 +1152,6 @@ body::after {
   animation: perimeter 0.6s ease forwards;
 }
 
-/* Question form result message */
 .result-message {
   color: var(--text);
   font-size: 1.25rem;
@@ -1476,7 +1475,6 @@ body::after {
     font-weight: 500;
 }
 
-/* ===== MAP VISUALIZATION WITH PIE CHARTS ===== */
 .map-visualization-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -46,7 +46,7 @@ class CrimeMapVisual {
         // Get container dimensions dynamically
         const bbox = this.container.node().getBoundingClientRect();
         const width = bbox.width || 600;
-        const height = Math.min(width * 0.7, 550); // Height proportional to width, max 550px
+        const height = Math.min(width * 0.7, 550); // Height proportional to width
 
         // Append SVG
         const svg = vis.container.append("svg")
@@ -130,7 +130,7 @@ class CrimeMapVisual {
                 d3.select("#tooltip").style("display", "none");
             });
 
-        // Show default data for a state (California) on load
+        // Show default data for a state on load
         const defaultState = states.find(s => s.properties.name === "California");
         if (defaultState) {
             const stateName = defaultState.properties.name;
