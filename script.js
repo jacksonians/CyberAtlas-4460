@@ -885,6 +885,17 @@
         .y1(d => yArea(d[1]))
         .curve(d3.curveMonotoneX);
 
+      // Add vertical tracking line
+      const verticalLine = areaG.append('line')
+        .attr('class', 'tracking-line')
+        .attr('y1', 0)
+        .attr('y2', areaHeight - margin.top - margin.bottom)
+        .attr('stroke', '#a889ff')
+        .attr('stroke-width', 2)
+        .attr('stroke-dasharray', '5,5')
+        .style('opacity', 0)
+        .style('pointer-events', 'none');
+
       // Draw areas
       const areaLayers = areaG.selectAll('.area-layer')
         .data(series)
@@ -899,30 +910,41 @@
           if (selectedType && selectedType !== d.key) return;
           
           d3.select(this).attr('opacity', 1);
-          const mouseDate = xArea.invert(d3.pointer(event, this)[0]);
-          const bisect = d3.bisector(d => d.data.date).left;
-          const index = bisect(d, mouseDate);
-          const dataPoint = d[index];
-          
-          if (dataPoint) {
-            const value = dataPoint[1] - dataPoint[0];
-            tooltip.transition().duration(150).style('opacity', 1);
-            tooltip.html(`<strong>${d.key}</strong><br/>Count: ${value.toLocaleString()}`)
-              .style('left', event.clientX + 12 + 'px')
-              .style('top', event.clientY - 40 + 'px');
-          }
+          tooltip.transition().duration(150).style('opacity', 1);
+          verticalLine.style('opacity', 1);
           
           // Highlight corresponding bar
           barBars.attr('opacity', bar => bar.type === d.key ? 1 : 0.3);
         })
-        .on('mousemove', event => {
-          tooltip.style('left', event.clientX + 12 + 'px')
-            .style('top', event.clientY - 40 + 'px');
+        .on('mousemove', function(event, d) {
+          if (selectedType && selectedType !== d.key) return;
+          
+          // Calculate which data point the mouse is over
+          const mouseX = d3.pointer(event, this)[0];
+          const mouseDate = xArea.invert(mouseX);
+          const bisect = d3.bisector(datum => datum.data.date).left;
+          const index = bisect(d, mouseDate);
+          
+          // Get the closest data point
+          const dataPoint = d[index] || d[d.length - 1];
+          
+          if (dataPoint) {
+            const value = dataPoint[1] - dataPoint[0];
+            
+            // Update vertical line position
+            verticalLine.attr('x1', mouseX).attr('x2', mouseX);
+            
+            // Update tooltip content (without date) AND position
+            tooltip.html(`<strong>${d.key}</strong><br/>${value.toLocaleString()} attacks`)
+              .style('left', event.clientX + 12 + 'px')
+              .style('top', event.clientY - 40 + 'px');
+          }
         })
         .on('mouseout', function(event, d) {
           if (selectedType) return;
           d3.select(this).attr('opacity', 0.7);
           tooltip.transition().duration(200).style('opacity', 0);
+          verticalLine.style('opacity', 0);
           barBars.attr('opacity', 1);
         })
         .on('click', function(event, d) {
