@@ -49,7 +49,18 @@
     scenes.forEach((scene) => scene.classList.remove('is-active'));
   }
 
+  let currentSceneIndex = 0;
+
+  // reset visuals 
   function setActiveScene(index) {
+    const previousScene = scenes[currentSceneIndex];
+    if (previousScene && previousScene.id === 'section9' && index !== currentSceneIndex) {
+      if (typeof window.resetLinkedChartSelections === 'function') {
+        window.resetLinkedChartSelections();
+      }
+    }
+    
+    currentSceneIndex = index;
     clearActive();
     const dots = getDots();
     const scene = scenes[index];
@@ -940,6 +951,9 @@
     if (areaCardParent) areaCardParent.style.overflow = 'visible';
     if (barCardParent) barCardParent.style.overflow = 'visible';
 
+    // Store references for resetting selections
+    let areaLayers, barBars, verticalLine, tooltip, selectedType = null;
+
     // Dimensions
     const areaWidth = 480;
     const areaHeight = 400;
@@ -959,7 +973,7 @@
       .attr('height', barHeight);
 
     // Tooltip
-    const tooltip = d3.select('body')
+    tooltip = d3.select('body')
       .append('div')
       .attr('class', 'linked-chart-tooltip')
       .style('position', 'fixed')
@@ -1022,9 +1036,6 @@
         .domain(topAttackTypes)
         .range(['#a889ff', '#6fcf97', '#f2c94c', '#eb5757', '#56ccf2', '#ff6b9d', '#ffa94d']);
 
-      // State for linked highlighting
-      let selectedType = null;
-
       const areaG = areaSvg.append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
@@ -1053,7 +1064,7 @@
         .curve(d3.curveMonotoneX);
 
       // Add vertical tracking line
-      const verticalLine = areaG.append('line')
+      verticalLine = areaG.append('line')
         .attr('class', 'tracking-line')
         .attr('y1', 0)
         .attr('y2', areaHeight - margin.top - margin.bottom)
@@ -1064,7 +1075,7 @@
         .style('pointer-events', 'none');
 
       // Draw areas
-      const areaLayers = areaG.selectAll('.area-layer')
+      areaLayers = areaG.selectAll('.area-layer')
         .data(series)
         .enter()
         .append('path')
@@ -1108,10 +1119,12 @@
           }
         })
         .on('mouseout', function(event, d) {
-          if (selectedType) return;
-          d3.select(this).attr('opacity', 0.7);
+          // hide tooltip and vertical line on mouseout
           tooltip.transition().duration(200).style('opacity', 0);
           verticalLine.style('opacity', 0);
+          
+          if (selectedType) return;
+          d3.select(this).attr('opacity', 0.7);
           barBars.attr('opacity', 1);
         })
         .on('click', function(event, d) {
@@ -1178,7 +1191,7 @@
         .nice()
         .range([barHeight - margin.top - margin.bottom, 0]);
 
-      const barBars = barG.selectAll('.bar')
+      barBars = barG.selectAll('.bar')
         .data(attackCounts.slice(0, 7))
         .enter()
         .append('rect')
@@ -1207,9 +1220,10 @@
             .style('top', event.clientY - 40 + 'px');
         })
         .on('mouseout', function() {
+          tooltip.transition().duration(200).style('opacity', 0);
+          
           if (selectedType) return;
           d3.select(this).attr('opacity', 1);
-          tooltip.transition().duration(200).style('opacity', 0);
           areaLayers.attr('opacity', 0.7);
         })
         .on('click', function(event, d) {
@@ -1261,6 +1275,21 @@
         .attr('fill', '#e6edf7')
         .attr('font-size', '12px')
         .text('Total Count');
+
+      // reset function to clear selections
+      window.resetLinkedChartSelections = function() {
+        if (areaLayers && barBars) {
+          selectedType = null;
+          areaLayers.attr('opacity', 0.7).attr('stroke', 'none').attr('stroke-width', 0);
+          barBars.attr('opacity', 1).attr('stroke', 'none').attr('stroke-width', 0);
+          if (verticalLine) {
+            verticalLine.style('opacity', 0);
+          }
+          if (tooltip) {
+            tooltip.transition().duration(0).style('opacity', 0);
+          }
+        }
+      };
     });
   }
 
