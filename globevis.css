@@ -1,4 +1,4 @@
-/* Map/Globe specific styling */
+/* Map/Globe styling */
 .card {
     width: 100%;
     min-height: 500px;
@@ -14,7 +14,6 @@
     background: transparent;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .sidebar {
         width: 60px;
@@ -59,7 +58,7 @@
     }
 }
 
-/* Animation for section entrance */
+/* Animation for entrance */
 .content-section {
     opacity: 0;
     animation: fadeIn 0.8s ease-in forwards;
@@ -71,7 +70,7 @@
     }
 }
 
-/* Tooltip Styles for D3 visualizations */
+/* Tooltip Styles */
 .tooltip {
     position: absolute;
     text-align: left;

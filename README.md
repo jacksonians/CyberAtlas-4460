@@ -61,7 +61,7 @@ In the "What Actually Reduces Risk" section, the bipartite network supports sele
 
 ### Node-Spread Simulation Timing
 
-The attack-propagation simulation (in the "One Breach Impacts More Than You Think" section) uses a simple queue-based model where each infected node passes the attack to the next after a fixed time, and in our case, we use one second per hop in the animation. Based on data from ReliaQuest, this roughly corresponds to about twenty minutes of real-world movement time, and the timing comes from `data/breakout_time.csv`.
+The attack-propagation simulation (in the "One Breach Impacts More Than You Think" section) uses a simple queue-based model where each infected node passes the attack to the next after a fixed time, and in our case, we use one second per hop in the animation. Based on data from ReliaQuest, this roughly corresponds to about twenty minutes of real-world movement time, and the timing comes from `data/breakout_time.csv`. The visualization restarts if you click on any node that hasn’t been infected yet, and clicking the original starting node resets everything back to the beginning.
 
 ## Team
 

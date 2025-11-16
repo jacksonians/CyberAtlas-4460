@@ -46,7 +46,7 @@ class CrimeMapVisual {
         // Get container dimensions dynamically
         const bbox = this.container.node().getBoundingClientRect();
         const width = bbox.width || 600;
-        const height = Math.min(width * 0.7, 550); // Height proportional to width
+        const height = Math.min(width * 0.7, 550);
 
         // Append SVG
         const svg = vis.container.append("svg")

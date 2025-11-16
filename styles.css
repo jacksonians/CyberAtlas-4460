@@ -22,6 +22,7 @@
     box-sizing: border-box;
 }
 
+/* Scroll */
 html {
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
@@ -71,6 +72,7 @@ main {
   position: relative;
 }
 
+/* Main section container */
 .scene {
   position: relative;
   min-height: 100vh;
@@ -107,6 +109,7 @@ main {
   }
 }
 
+/* Card style for content sections */
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -177,6 +180,7 @@ main {
   font-weight: 500;
 }
 
+/* Button styles */
 .btn {
   position: relative;
   display: inline-flex;
@@ -268,6 +272,7 @@ main {
   z-index: 1;
 }
 
+/* Chip tags */
 .chip {
   padding: 0.65rem 1.4rem;
   border-radius: var(--radius-pill);
@@ -543,6 +548,7 @@ main {
   filter: blur(8px);
 }
 
+/* Hero section */
 .hero {
   position: relative;
   padding: clamp(3rem, 8vw, 6rem) clamp(2rem, 5vw, 6rem);
@@ -577,6 +583,7 @@ main {
   pointer-events: none;
 }
 
+/* Grid background for hero */
 .cyber-grid-bg {
   position: absolute;
   inset: 0;
@@ -645,6 +652,7 @@ main {
   pointer-events: none;
 }
 
+/* Global background effects */
 .global-background-effects {
   position: fixed;
   inset: 0;
@@ -1064,6 +1072,7 @@ body::after {
   mix-blend-mode: soft-light;
 }
 
+/* Navigation dot rail on the right side */
 #dot-rail {
   position: fixed;
   right: clamp(1.5rem, 4vw, 3rem);
@@ -1125,6 +1134,7 @@ body::after {
   letter-spacing: 0.18em;
 }
 
+/* Elements that get animated on scroll */
 .card,
 .chip,
 .scene .placeholder,
@@ -1199,6 +1209,7 @@ body::after {
   overflow: visible;
 }
 
+/* Animation for perimeter highlight */
 @keyframes perimeter {
   0% {
     opacity: 0;
@@ -1210,6 +1221,7 @@ body::after {
   }
 }
 
+/* Glitch effect for hero title */
 @keyframes glitch {
   0% {
     clip-path: inset(20% 0 20% 0);
@@ -1475,6 +1487,7 @@ body::after {
     font-weight: 500;
 }
 
+/* US map & pie charts */
 .map-visualization-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1568,7 +1581,7 @@ body::after {
   }
 }
 
-/* ===== ATTACK–TOOL BIPARTITE NETWORK ===== */
+/* Attack–Tool Bipartite Network */
 .network-wrapper { padding: 1.5rem 0; }
 .network-description { text-align: center; color: var(--text-secondary); margin-bottom: 1.25rem; }
 .network-controls { display: flex; gap: 1rem; justify-content: center; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
@@ -1600,7 +1613,7 @@ body::after {
 .network-node.tool { fill: #6BFFA8; stroke: rgba(107,255,168,0.5); }
 .network-node:hover { stroke-width: 3; filter: brightness(1.2); }
 
-/* Selected node state - visually "locked on" with stronger border and glow */
+/* Selected node state */
 .network-node.selected {
   stroke-width: 4;
   stroke: rgba(255,255,255,0.9);
@@ -1615,7 +1628,7 @@ body::after {
 
 .network-node-label { font-size: 11px; font-weight: 500; text-anchor: middle; dominant-baseline: middle; pointer-events: none; fill: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.7); }
 
-/* Network links */
+/* Network links between nodes */
 .network-link { stroke-opacity: 0.6; fill: none; }
 .network-link.hover { stroke-opacity: 1; stroke-width: 3; }
 
