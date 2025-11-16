@@ -48,7 +48,7 @@ We relied on several external libraries (all loaded via CDN):
 
 ## Project Links
 
-**Live Website:** [INSERT URL]
+**Live Website:** https://jacksonians.github.io/CyberAtlas-4460/
 
 **Screencast Video:** https://youtu.be/TKjWsgYeC3Y
 
