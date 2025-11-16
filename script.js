@@ -399,7 +399,13 @@
         .data(links).enter()
         .append("line")
         .attr("stroke", "#bbb")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .style("opacity", 0.6);
+
+    let currentSourceNode = null; 
+    let infectedHistory = [];
+    let infectionLinks = [];
+    let isAnimating = false; 
 
     const nodeElems = attackSvg.append("g").selectAll("circle")
         .data(nodes).enter()
@@ -409,9 +415,26 @@
         .attr("stroke", "#333")
         .attr("stroke-width", 1.2)
         .style("cursor", "pointer")
+        .on("mouseover", function(event, d) {
+            d3.select(this)
+                .style("filter", "drop-shadow(0 0 12px rgba(102, 224, 255, 0.8))")
+                .attr("stroke-width", 2.5)
+                .attr("stroke", "#66e0ff");
+        })
+        .on("mouseout", function(event, d) {
+            d3.select(this)
+                .style("filter", "none")
+                .attr("stroke-width", 1.2)
+                .attr("stroke", "#333");
+        })
         .on("click", (event, d) => {
-            if (d.state === "attacked" || d.state === "propagating") return;
-            startAttack(d);
+            if (isAnimating) return;
+            
+            if (currentSourceNode && currentSourceNode.id === d.id) {
+                reverseAttack();
+            } else if (!d.state || d.state === "safe") {
+                startAttack(d);
+            }
         });
 
     const labelElems = attackSvg.append("g").selectAll("text")
@@ -528,6 +551,59 @@
             });
     }
 
+    function animateAttackLine(fromNode, toNode, callback) {
+        // link between these two nodes
+        const link = linkElems.filter(d => {
+            const sourceId = typeof d.source === 'string' ? d.source : d.source.id;
+            const targetId = typeof d.target === 'string' ? d.target : d.target.id;
+            return (sourceId === fromNode.id && targetId === toNode.id) || 
+                   (sourceId === toNode.id && targetId === fromNode.id);
+        });
+
+        infectionLinks.push({ from: fromNode, to: toNode });
+
+        link.transition()
+            .duration(200)
+            .attr("stroke", "#ff3366")
+            .attr("stroke-width", 4)
+            .style("opacity", 1);
+
+        const pulse = attackSvg.append("circle")
+            .attr("cx", fromNode.x)
+            .attr("cy", fromNode.y)
+            .attr("r", 8)
+            .attr("fill", "#ff3366")
+            .attr("stroke", "#ffaa00")
+            .attr("stroke-width", 2)
+            .style("opacity", 1);
+
+        pulse.transition()
+            .duration(800)
+            .ease(d3.easeCubicInOut)
+            .attr("cx", toNode.x)
+            .attr("cy", toNode.y)
+            .style("opacity", 0.8)
+            .on("end", () => {
+                const explosion = attackSvg.append("circle")
+                    .attr("cx", toNode.x)
+                    .attr("cy", toNode.y)
+                    .attr("r", 8)
+                    .attr("fill", "none")
+                    .attr("stroke", "#ff3366")
+                    .attr("stroke-width", 3)
+                    .style("opacity", 1);
+
+                explosion.transition()
+                    .duration(400)
+                    .attr("r", 25)
+                    .style("opacity", 0)
+                    .on("end", () => explosion.remove());
+
+                pulse.remove();
+                if (callback) callback();
+            });
+    }
+
       function startAttack(sourceNode) {
           // Reset all nodes
           nodes.forEach(node => {
@@ -535,6 +611,19 @@
                   markNodeState(node, "safe");
               }
           });
+
+          // reset links
+          linkElems.transition()
+              .duration(300)
+              .attr("stroke", "#bbb")
+              .attr("stroke-width", 2)
+              .style("opacity", 0.6);
+
+          // Set animation flag and track source
+          isAnimating = true;
+          currentSourceNode = sourceNode;
+          infectedHistory = [sourceNode];
+          infectionLinks = [];
 
           // Mark clicked node
           markNodeState(sourceNode, "attacked");
@@ -548,11 +637,13 @@
           function spreadInfection() {
               if (queue.length === 0) {
                   // All nodes that can be reached are infected
+                  isAnimating = false; 
                   return;
               }
 
               //Get the next node to spread from
               const currentId = queue.shift();
+              const currentNode = nodes.find(n => n.id === currentId);
               const neighbors = neighborMap.get(currentId) || [];
               
               // Find uninfected neighbors
@@ -563,23 +654,45 @@
               if (uninfectedNeighbors.length > 0) {
                   // Infect one random neighbor
                   const nextNode = uninfectedNeighbors[Math.floor(Math.random() * uninfectedNeighbors.length)];
-                  infected.add(nextNode.id);
-                  markNodeState(nextNode, "attacked");
-                  queue.push(nextNode.id);
-              }
-
-              // Continue spreading
-              if (queue.length > 0) {
-                  setTimeout(spreadInfection, 1000);
+                  
+                  // Animate attack line from current node to next node
+                  animateAttackLine(currentNode, nextNode, () => {
+                      infected.add(nextNode.id);
+                      infectedHistory.push(nextNode); 
+                      markNodeState(nextNode, "attacked");
+                      queue.push(nextNode.id);
+                      
+                      if (queue.length > 0) {
+                          setTimeout(spreadInfection, 200);
+                      } else {
+                          isAnimating = false;
+                          
+                          const info = document.getElementById("infoMessage");
+                          if (info) {
+                              info.innerHTML = `
+                <strong>${sourceNode.id}</strong> was compromised, triggering a chain reaction that disabled ${infected.size} critical system${infected.size > 1 ? 's' : ''},
+                from transportation and healthcare to communication and power. 
+                <br><br><em>This demonstrates how a single breach can paralyze an entire city's infrastructure.</em>
+                <br><br><span style="color: #66e0ff; font-size: 0.9rem;">Click <strong>${sourceNode.id}</strong> again to reset the simulation.</span>
+            `;
+                          }
+                      }
+                  });
               } else {
-                  // Update informational message
-                  const info = document.getElementById("infoMessage");
-                  if (info) {
-                      info.innerHTML = `
+                  if (queue.length > 0) {
+                      setTimeout(spreadInfection, 200);
+                  } else {
+                      isAnimating = false;
+                      
+                      const info = document.getElementById("infoMessage");
+                      if (info) {
+                          info.innerHTML = `
             <strong>${sourceNode.id}</strong> was compromised, triggering a chain reaction that disabled ${infected.size} critical system${infected.size > 1 ? 's' : ''},
             from transportation and healthcare to communication and power. 
             <br><br><em>This demonstrates how a single breach can paralyze an entire city's infrastructure.</em>
+            <br><br><span style="color: #66e0ff; font-size: 0.9rem;">Click <strong>${sourceNode.id}</strong> again to reset the simulation.</span>
         `;
+                      }
                   }
               }
           }
@@ -594,6 +707,60 @@
         <strong>${sourceNode.id}</strong> was compromised. Watch as the attack spreads to connected systems...
     `;
           }
+      }
+
+      function reverseAttack() {
+          isAnimating = true;
+          
+          const info = document.getElementById("infoMessage");
+          if (info) {
+              info.innerHTML = `
+        Reversing the attack simulation. Systems are coming back online one by one...
+    `;
+          }
+
+          // Start from the last infected node
+          let index = infectedHistory.length - 1;
+          
+          function restoreNode() {
+              if (index < 0) {
+                  // reset all nodes
+                  currentSourceNode = null;
+                  infectedHistory = [];
+                  infectionLinks = [];
+                  isAnimating = false;
+                  
+                  if (info) {
+                      info.innerHTML = `All Nodes Online`;
+                  }
+                  return;
+              }
+
+              // Restore current node (going backwards)
+              const nodeToRestore = infectedHistory[index];
+              markNodeState(nodeToRestore, "safe");
+              
+              // Restore the corresponding link (if not the source node)
+              if (index > 0 && infectionLinks[index - 1]) {
+                  const linkInfo = infectionLinks[index - 1];
+                  linkElems.filter(d => {
+                      const sourceId = typeof d.source === 'string' ? d.source : d.source.id;
+                      const targetId = typeof d.target === 'string' ? d.target : d.target.id;
+                      return (sourceId === linkInfo.from.id && targetId === linkInfo.to.id) || 
+                             (sourceId === linkInfo.to.id && targetId === linkInfo.from.id);
+                  }).transition()
+                      .duration(300)
+                      .attr("stroke", "#bbb")
+                      .attr("stroke-width", 2)
+                      .style("opacity", 0.6);
+              }
+              
+              index--;
+
+              setTimeout(restoreNode, 1000);
+          }
+
+          setTimeout(restoreNode, 1000);
       }
 
   }
