@@ -50,7 +50,7 @@ We relied on several external libraries (all loaded via CDN):
 
 **Live Website:** [INSERT URL]
 
-**Screencast Video:** [INSERT VIDEO URL]
+**Screencast Video:** https://youtu.be/TKjWsgYeC3Y
 
 
 ## Non-Obvious Features
