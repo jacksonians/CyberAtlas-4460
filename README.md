@@ -6,7 +6,13 @@ CyberAtlas is a single-page interactive dashboard we built to explore different 
 
 We organized the project as a scrolling narrative, where each section introduces a different visualization or idea. You can either scroll normally or use the navigation rail on the right to jump between sections.
 
-## What's Ours vs. What's Not
+## Project Links
+
+**First Place Winner:** https://youtu.be/StiV1Chu8Lc?t=2271
+
+**Live Website:** https://jacksonians.github.io/CyberAtlas-4460/
+
+**Screencast Video:** https://youtu.be/TKjWsgYeC3Y
 
 ### Our Code
 
@@ -44,24 +50,6 @@ We relied on several external libraries (all loaded via CDN):
 - **GSAP 3.12.2** – Animation library for the scroll-based movement and transitions.
 - **ScrollTrigger 3.12.2** – GSAP plugin to coordinate animations with scrolling.
 - **Google Fonts** – Archivo, IBM Plex Mono, Inter.
-
-
-## Project Links
-
-**Live Website:** https://jacksonians.github.io/CyberAtlas-4460/
-
-**Screencast Video:** https://youtu.be/TKjWsgYeC3Y
-
-
-## Non-Obvious Features
-
-### Multi-Node Selection in the Bipartite Network
-
-In the "What Actually Reduces Risk" section, the bipartite network supports selecting more than one node at a time, as clicking a node keeps it highlighted, and you can select as many nodes as you want from either side. Their connections all remain visible, which makes it easier to compare several attack types or tools at the same time, and clicking a selected node again deselects it, and clicking in the empty space clears everything.
-
-### Node-Spread Simulation Timing
-
-The attack-propagation simulation (in the "One Breach Impacts More Than You Think" section) uses a simple queue-based model where each infected node passes the attack to the next after a fixed time, and in our case, we use one second per hop in the animation. Based on data from ReliaQuest, this roughly corresponds to about twenty minutes of real-world movement time, and the timing comes from `data/breakout_time.csv`. The visualization restarts if you click on any node that hasn’t been infected yet, and clicking the original starting node resets everything back to the beginning.
 
 ## Team
 
